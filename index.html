@@ -66,19 +66,40 @@
         .add-to-cart { width: 100%; padding: 12px; background: var(--charcoal); color: var(--matte-gold); border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: bold; transition: 0.3s; }
         .add-to-cart:hover { background: var(--burgundy); color: white; }
 
-        /* Lookbook */
-        .lookbook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .lookbook-item { overflow: hidden; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: #000; cursor: pointer; }
-        .lookbook-img { width: 100%; height: 300px; object-fit: cover; transition: transform 0.5s ease, opacity 0.3s ease; }
-        .lookbook-item:hover .lookbook-img { transform: scale(1.08); opacity: 0.9; }
+        /* --- REDESIGNED CINEMATIC LOOKBOOK SECTION --- */
+        .lookbook-section {
+            background-color: #0f0f0f; color: #ffffff; padding: 100px 40px; text-align: center;
+            border-top: 2px solid var(--matte-gold); border-bottom: 2px solid var(--matte-gold);
+        }
+        .lookbook-section h2 { font-size: 36px; color: var(--matte-gold); letter-spacing: 4px; margin-bottom: 15px; text-transform: uppercase; }
+        .lookbook-section .section-desc { color: #aaa; max-width: 750px; margin: 0 auto 50px auto; font-size: 16px; }
+
+        .lookbook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1300px; margin: 0 auto; }
+        .lookbook-item {
+            position: relative; overflow: hidden; border-radius: 6px; background: #1a1a1a;
+            border: 1px solid rgba(197, 160, 89, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        .lookbook-item:hover {
+            transform: translateY(-8px); border-color: var(--matte-gold);
+            box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25);
+        }
+        .lookbook-media {
+            width: 100%; height: 360px; object-fit: cover; display: block;
+            transition: transform 0.6s ease;
+        }
+        .lookbook-item:hover .lookbook-media { transform: scale(1.06); }
         
+        /* Lightbox Modal */
+        #lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.92); z-index: 300; justify-content: center; align-items: center; cursor: pointer; }
+        #lightbox-img { max-width: 90%; max-height: 90vh; border-radius: 4px; box-shadow: 0 5px 30px rgba(0,0,0,0.8); border: 1px solid var(--matte-gold); }
+
         #loading-msg { text-align: center; font-size: 18px; color: var(--matte-gold); }
 
-        /* --- MODALS (PDP, CART, AUTH, LIGHTBOX) --- */
+        /* --- MODALS (PDP, CART, AUTH) --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.7); z-index: 200; justify-content: center; align-items: center; }
         
-        /* Product Detail Modal */
-        .pdp-content { background: white; padding: 30px; border-radius: 8px; width: 800px; max-width: 90%; display: flex; gap: 30px; position: relative; flex-wrap: wrap; text-align: left; }
+        .pdp-content { background: white; padding: 30px; border-radius: 8px; width: 800px; max-width: 90%; display: flex; gap: 30px; position: relative; flex-wrap: wrap; text-align: left; color: var(--charcoal); }
         .pdp-images { flex: 1; min-width: 280px; }
         .pdp-main-img { width: 100%; height: 320px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; margin-bottom: 10px; }
         .pdp-thumbs { display: flex; gap: 10px; }
@@ -86,17 +107,13 @@
         .pdp-thumb.active { border-color: var(--matte-gold); }
         .pdp-details { flex: 1; min-width: 280px; display: flex; flex-direction: column; justify-content: center; }
         
-        /* Auth & Lightbox */
-        .auth-box { background: white; padding: 40px; border-radius: 8px; width: 350px; text-align: center; position: relative; }
+        .auth-box { background: white; padding: 40px; border-radius: 8px; width: 350px; text-align: center; position: relative; color: var(--charcoal); }
         .auth-box input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; }
         .auth-box button { width: 100%; padding: 15px; background: var(--charcoal); color: var(--matte-gold); border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         .auth-box button:hover { background: var(--burgundy); color: white; }
         .auth-switch { margin-top: 15px; font-size: 14px; color: #666; cursor: pointer; text-decoration: underline; }
 
-        #lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.9); z-index: 300; justify-content: center; align-items: center; cursor: pointer; }
-        #lightbox-img { max-width: 90%; max-height: 90vh; border-radius: 4px; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
-
-        #cart-modal { display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 200; flex-direction: column; }
+        #cart-modal { display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 200; flex-direction: column; color: var(--charcoal); }
         .cart-header { background: var(--charcoal); color: var(--matte-gold); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .cart-items { flex-grow: 1; padding: 20px; overflow-y: auto; }
         .cart-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
@@ -174,14 +191,14 @@
         </div>
     </div>
 
-    <!-- INSPIRATION LOOKBOOK GALLERY -->
-    <div id="lookbook" class="section-container" style="background-color: white;">
+    <!-- REDESIGNED CINEMATIC LOOKBOOK GALLERY -->
+    <div id="lookbook" class="lookbook-section">
         <h2>The Artisan's Lookbook</h2>
-        <p class="section-desc">Witness the alchemy of raw materials transformed into wearable art. Click any piece to inspect the exquisite details closely.</p>
+        <p class="section-desc">Witness the alchemy of raw materials transformed into wearable art. Explore our curation of cinematic showcases and finished jewelry pieces crafted from our collection.</p>
         <div class="lookbook-grid" id="gallery-grid"></div>
     </div>
 
-    <!-- LIGHTBOX MODAL FOR GALLERY -->
+    <!-- LIGHTBOX MODAL FOR GALLERY IMAGES -->
     <div id="lightbox-modal" onclick="closeLightbox()">
         <img id="lightbox-img" src="" alt="Enlarged Lookbook Piece">
     </div>
@@ -246,15 +263,46 @@
                 renderCatalog();
 
                 const galleryRes = await fetch('lookbook.json');
-                const galleryImages = await galleryRes.json();
-                if(galleryImages && galleryImages.length > 0) {
-                    renderGallery(galleryImages);
+                const galleryItems = await galleryRes.json();
+                if(galleryItems && galleryItems.length > 0) {
+                    renderGallery(galleryItems);
                 }
             } catch (err) {
                 console.error("Error loading collection or lookbook:", err);
                 document.getElementById('loading-msg').innerText = "Error loading collection. Please try again later.";
             }
         };
+
+        // --- LOOKBOOK GALLERY LOGIC (Supports both Images and MP4 Videos) ---
+        function renderGallery(items) {
+            const galleryGrid = document.getElementById('gallery-grid');
+            galleryGrid.innerHTML = '';
+            
+            items.forEach(url => {
+                const div = document.createElement('div');
+                div.className = 'lookbook-item';
+                
+                // Check if file is a video (.mp4) or image
+                const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.mov');
+                
+                if (isVideo) {
+                    div.innerHTML = `<video src="${url}" autoplay loop muted playsinline class="lookbook-media"></video>`;
+                } else {
+                    div.innerHTML = `<img src="${url}" class="lookbook-media" alt="Artisan Jewelry Piece" onclick="openLightbox('${url}')">`;
+                }
+                
+                galleryGrid.appendChild(div);
+            });
+        }
+
+        function openLightbox(url) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-modal').style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').style.display = 'none';
+        }
 
         // --- PRODUCT DETAIL MODAL (PDP) LOGIC ---
         function openPdp(sku) {
@@ -266,14 +314,12 @@
             const price = Number(item["Resale Price"]).toFixed(2);
             document.getElementById('pdp-price').innerText = `£${price}`;
 
-            // Description logic (uses enhanced description if available, otherwise professional fallback)
             let desc = item["Enhanced Description"];
             if (!desc || desc.trim() === "") {
                 desc = `Expertly curated by Roman Keno, this piece (${item["Product Name"]}) meets the exacting standards of professional independent creators and boutique designers. Sourced for optimal brilliance, structural durability, and seamless integration into custom jewelry assemblies.`;
             }
             document.getElementById('pdp-desc').innerText = desc;
 
-            // Images logic (Image 1 & Image 2)
             const img1 = item["Image 1 URL"] ? item["Image 1 URL"] : "https://via.placeholder.com/300x250?text=Roman+Keno";
             const img2 = item["Image 2 URL"] ? item["Image 2 URL"] : "";
             
@@ -282,14 +328,12 @@
             const thumbsContainer = document.getElementById('pdp-thumbs-container');
             thumbsContainer.innerHTML = '';
             
-            // Add thumb 1
             const t1 = document.createElement('img');
             t1.src = img1;
             t1.className = 'pdp-thumb active';
             t1.onclick = () => { setActivePdpImage(img1, t1); };
             thumbsContainer.appendChild(t1);
 
-            // Add thumb 2 if exists
             if(img2) {
                 const t2 = document.createElement('img');
                 t2.src = img2;
@@ -298,7 +342,6 @@
                 thumbsContainer.appendChild(t2);
             }
 
-            // Bind add button
             document.getElementById('pdp-add-btn').onclick = () => {
                 const qty = parseInt(document.getElementById('pdp-qty').value) || 1;
                 addToCartWithOptions(item["SKU / Set ID"], item["Product Name"], price, qty);
@@ -316,27 +359,6 @@
 
         function closePdp() {
             document.getElementById('pdp-modal').style.display = 'none';
-        }
-
-        // --- LIGHTBOX GALLERY LOGIC ---
-        function renderGallery(images) {
-            const galleryGrid = document.getElementById('gallery-grid');
-            galleryGrid.innerHTML = '';
-            images.forEach(imgUrl => {
-                const div = document.createElement('div');
-                div.className = 'lookbook-item';
-                div.innerHTML = `<img src="${imgUrl}" class="lookbook-img" alt="Artisan Jewelry Piece" onclick="openLightbox('${imgUrl}')">`;
-                galleryGrid.appendChild(div);
-            });
-        }
-
-        function openLightbox(url) {
-            document.getElementById('lightbox-img').src = url;
-            document.getElementById('lightbox-modal').style.display = 'flex';
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox-modal').style.display = 'none';
         }
 
         // --- AUTHENTICATION LOGIC ---
@@ -409,7 +431,7 @@
             btn.innerText = "Register";
         }
 
-        // --- RENDER LOGIC ---
+        // --- RENDER CATALOG ---
         function renderCatalog() {
             const grid = document.getElementById('product-grid');
             document.getElementById('loading-msg').style.display = 'none';
@@ -421,9 +443,7 @@
                 
                 const card = document.createElement('div');
                 card.className = 'product-card';
-                // Clicking the card opens the Product Detail View (PDP)
                 card.onclick = (e) => {
-                    // Prevent opening PDP if clicking the direct "Add" button
                     if(e.target.tagName !== 'BUTTON') {
                         openPdp(item["SKU / Set ID"]);
                     }
