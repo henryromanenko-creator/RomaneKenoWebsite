@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roman Keno | Luxury Artisan Supplies</title>
+    <style>
+        :root {
+            --burgundy: #5c001e;
+            --charcoal: #1a1a1a;
+            --matte-gold: #c5a059;
+            --light-bg: #fafafa;
+        }
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--light-bg); color: var(--charcoal);
+            scroll-behavior: smooth;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed; width: 100%; top: 0; z-index: 100;
+            background-color: rgba(26, 26, 26, 0.95);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 40px; box-sizing: border-box;
+            border-bottom: 1px solid var(--matte-gold);
+        }
+        .nav-logo img {
+            height: 60px; mix-blend-mode: screen; filter: brightness(1.2);
+        }
+        .nav-links button {
+            background: none; border: none; color: white;
+            font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+            margin-left: 20px; cursor: pointer; transition: 0.3s;
+        }
+        .nav-links button:hover { color: var(--matte-gold); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            position: relative; height: 100vh; width: 100%;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; text-align: center;
+        }
+        .hero video {
+            position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
+            width: auto; height: auto; z-index: 0; transform: translateX(-50%) translateY(-50%);
+            object-fit: cover; filter: brightness(0.6);
+        }
+        .hero-content { position: relative; z-index: 1; color: white; padding: 20px; }
+        .hero h1 { font-size: 48px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px; color: var(--matte-gold); }
+        .hero p { font-size: 18px; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6; }
+        .hero-btn {
+            background-color: var(--burgundy); color: white; padding: 15px 40px;
+            border: 1px solid var(--burgundy); font-size: 14px; letter-spacing: 2px;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+        }
+        .hero-btn:hover { background-color: transparent; border: 1px solid var(--matte-gold); color: var(--matte-gold); }
+
+        /* --- CATALOG & GALLERY --- */
+        .section-container { padding: 80px 40px; text-align: center; }
+        .section-container h2 { font-size: 32px; color: var(--burgundy); letter-spacing: 3px; margin-bottom: 15px; text-transform: uppercase; }
+        .section-desc { max-width: 700px; margin: 0 auto 40px auto; color: #555; line-height: 1.6; font-size: 16px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        
+        /* Catalog Cards */
+        .product-card { background: white; border: 1px solid #eaeaea; transition: 0.3s; text-align: left; }
+        .product-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.05); transform: translateY(-5px); border-color: var(--matte-gold); }
+        .product-img { width: 100%; height: 250px; background: #eee; object-fit: cover; }
+        .product-info { padding: 20px; }
+        .product-title { font-size: 16px; font-weight: bold; margin: 0 0 10px 0; color: var(--charcoal); }
+        .product-price { font-size: 18px; color: var(--burgundy); margin: 0 0 15px 0; }
+        .add-to-cart {
+            width: 100%; padding: 12px; background: var(--charcoal); color: var(--matte-gold);
+            border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: bold; transition: 0.3s;
+        }
+        .add-to-cart:hover { background: var(--burgundy); color: white; }
+
+        /* Lookbook Masonry */
+        .lookbook-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto;
+        }
+        .lookbook-img { width: 100%; height: 350px; object-fit: cover; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        #loading-msg { text-align: center; font-size: 18px; color: var(--matte-gold); }
+
+        /* --- CART & CHECKOUT --- */
+        #cart-modal {
+            display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh;
+            background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 200; flex-direction: column;
+        }
+        .cart-header { background: var(--charcoal); color: var(--matte-gold); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .cart-header h3 { margin: 0; letter-spacing: 2px; }
+        .close-cart { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+        .cart-items { flex-grow: 1; padding: 20px; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .checkout-section { padding: 20px; border-top: 2px solid var(--matte-gold); background: var(--light-bg); }
+        .checkout-input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; }
+        .checkout-btn {
+            width: 100%; padding: 15px; background: var(--burgundy); color: white;
+            border: none; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-weight: bold;
+        }
+        .checkout-btn:hover { background: var(--charcoal); color: var(--matte-gold); }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="nav-logo">
+            <img src="https://raw.githubusercontent.com/henryromanenko-creator/RomanKenoStockManagement/main/Logo.png" alt="Roman Keno">
+        </div>
+        <div class="nav-links">
+            <button onclick="document.getElementById('catalog').scrollIntoView()">Supplies</button>
+            <button onclick="document.getElementById('lookbook').scrollIntoView()">Inspiration</button>
+            <button onclick="openCart()">Cart (<span id="cart-count">0</span>)</button>
+        </div>
+    </nav>
+
+    <!-- HERO BACKGROUND -->
+    <div class="hero">
+        <video autoplay loop muted playsinline>
+            <source src="https://raw.githubusercontent.com/henryromanenko-creator/RomaneKenoWebsite/main/Attached_Assets_Instruction_.mp4" type="video/mp4">
+        </video>
+        <div class="hero-content">
+            <h1>Curated Elegance</h1>
+            <p>Bridging European artistry with accessible, high-end materials for independent creators and boutique designers worldwide.</p>
+            <button class="hero-btn" onclick="document.getElementById('catalog').scrollIntoView()">Explore Collection</button>
+        </div>
+    </div>
+
+    <!-- CATALOG GRID -->
+    <div id="catalog" class="section-container">
+        <h2>The Material Archive</h2>
+        <p class="section-desc">Discover our hand-selected inventory of premium European and American jewelry components. Every piece is sourced for durability, brilliance, and flawless design execution.</p>
+        <div id="loading-msg">Summoning the archives...</div>
+        <div class="grid" id="product-grid"></div>
+    </div>
+
+    <!-- INSPIRATION GALLERY (LOOKBOOK) -->
+    <div id="lookbook" class="section-container" style="background-color: white;">
+        <h2>The Artisan's Lookbook</h2>
+        <p class="section-desc">Witness the alchemy of raw materials transformed into wearable art. These finished pieces—crafted utilizing the exact components available in our collection—serve as a testament to what is possible. Let these designs ignite your imagination and elevate your next creation.</p>
+        <div class="lookbook-grid" id="gallery-grid">
+            <!-- Images inject here -->
+        </div>
+    </div>
+
+    <!-- SLIDING CART -->
+    <div id="cart-modal">
+        <div class="cart-header">
+            <h3>YOUR ORDER</h3>
+            <button class="close-cart" onclick="closeCart()">✕</button>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <p style="text-align:center; color:#888;">Your cart is empty.</p>
+        </div>
+        <div class="checkout-section">
+            <h3 style="margin-top:0; color:var(--charcoal);">Total: £<span id="cart-total">0.00</span></h3>
+            <input type="email" id="chk-email" class="checkout-input" placeholder="Email Address" required>
+            <input type="text" id="chk-shipping" class="checkout-input" placeholder="Shipping Address" required>
+            <button class="checkout-btn" onclick="processMockCheckout()" id="btn-checkout">Pay with Tide / Card (Mock)</button>
+            <div id="checkout-msg" style="margin-top:10px; font-weight:bold; text-align:center;"></div>
+        </div>
+    </div>
+
+    <script>
+        // === YOUR LIVE GOOGLE APPS SCRIPT WEB APP URL ===
+        const API_URL = "https://script.google.com/macros/s/AKfycbzpUweCFWDQwOLCLAS3ZgOWIrGywxuOuh4H7gvS6QfjW4W9Oxqa_UJoIlqqNcy96uM_/exec";
+        
+        let catalogData = [];
+        let cart = [];
+
+        // 1. Fetch Catalog & Gallery on Load
+        window.onload = async () => {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                // Process Catalog
+                catalogData = data.catalog.filter(item => item["SKU / Set ID"] !== "" && Number(item["Live Stock"]) > 0);
+                renderCatalog();
+
+                // Process Gallery
+                if(data.gallery && data.gallery.length > 0) {
+                    renderGallery(data.gallery);
+                }
+            } catch (err) {
+                document.getElementById('loading-msg').innerText = "Error loading collection. Please try again later.";
+            }
+        };
+
+        // 2. Render Products
+        function renderCatalog() {
+            const grid = document.getElementById('product-grid');
+            document.getElementById('loading-msg').style.display = 'none';
+            grid.innerHTML = '';
+
+            catalogData.forEach(item => {
+                const price = Number(item["Resale Price"]).toFixed(2);
+                const imgUrl = item["Image 1 URL"] ? item["Image 1 URL"] : "https://via.placeholder.com/300x250?text=Roman+Keno";
+                
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${imgUrl}" alt="${item["Product Name"]}" class="product-img">
+                    <div class="product-info">
+                        <h4 class="product-title">${item["Product Name"]}</h4>
+                        <p class="product-price">£${price}</p>
+                        <button class="add-to-cart" onclick="addToCart('${item["SKU / Set ID"]}', '${item["Product Name"].replace(/'/g, "\\'")}', ${price})">Add to Order</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 3. Render Lookbook Gallery
+        function renderGallery(images) {
+            const galleryGrid = document.getElementById('gallery-grid');
+            galleryGrid.innerHTML = '';
+            images.forEach(imgUrl => {
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.className = 'lookbook-img';
+                img.alt = 'Roman Keno Finished Artisan Jewelry';
+                galleryGrid.appendChild(img);
+            });
+        }
+
+        // 4. Cart Logic
+        function addToCart(sku, name, price) {
+            const existingItem = cart.find(i => i.sku === sku);
+            if (existingItem) { existingItem.qty += 1; } 
+            else { cart.push({ sku, name, price, qty: 1 }); }
+            updateCartUI();
+            openCart();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            const container = document.getElementById('cart-items-container');
+            let total = 0;
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888;">Your cart is empty.</p>';
+            } else {
+                container.innerHTML = '';
+                cart.forEach((item, index) => {
+                    const itemTotal = item.price * item.qty;
+                    total += itemTotal;
+                    container.innerHTML += `
+                        <div class="cart-item">
+                            <div><strong>${item.name}</strong><br><small>Qty: ${item.qty} | SKU: ${item.sku}</small></div>
+                            <div>£${itemTotal.toFixed(2)}<br><small><a href="#" onclick="removeItem(${index})" style="color:red;">Remove</a></small></div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('cart-total').innerText = total.toFixed(2);
+        }
+
+        function removeItem(index) { cart.splice(index, 1); updateCartUI(); }
+        function openCart() { document.getElementById('cart-modal').style.display = 'flex'; }
+        function closeCart() { document.getElementById('cart-modal').style.display = 'none'; }
+
+        // 5. Mock Checkout
+        async function processMockCheckout() {
+            if (cart.length === 0) return alert("Cart is empty!");
+            
+            const email = document.getElementById('chk-email').value;
+            const shipping = document.getElementById('chk-shipping').value;
+            const total = document.getElementById('cart-total').innerText;
+            const btn = document.getElementById('btn-checkout');
+            const msg = document.getElementById('checkout-msg');
+
+            if (!email || !shipping) return alert("Please enter email and shipping details.");
+
+            btn.innerText = "Processing Securely..."; btn.disabled = true;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ email: email, shipping: shipping, total: total, cart: cart })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    msg.style.color = "green"; msg.innerText = `Success! Order ID: ${result.orderId}`;
+                    cart = []; updateCartUI();
+                    setTimeout(() => { closeCart(); msg.innerText = ""; btn.innerText = "Pay with Tide / Card (Mock)"; btn.disabled = false; }, 3000);
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (err) {
+                msg.style.color = "red"; msg.innerText = "Error: " + err.message;
+                btn.innerText = "Try Again"; btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
