@@ -12,96 +12,82 @@
             --light-bg: #fafafa;
         }
         body, html {
-            margin: 0; padding: 0;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--light-bg); color: var(--charcoal);
-            scroll-behavior: smooth;
+            margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--light-bg); color: var(--charcoal); scroll-behavior: smooth;
         }
 
         /* --- NAVIGATION --- */
         nav {
-            position: fixed; width: 100%; top: 0; z-index: 100;
-            background-color: rgba(26, 26, 26, 0.95);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 40px; box-sizing: border-box;
+            position: fixed; width: 100%; top: 0; z-index: 100; background-color: rgba(26, 26, 26, 0.98);
+            display: flex; justify-content: space-between; align-items: center; padding: 10px 40px; box-sizing: border-box;
             border-bottom: 1px solid var(--matte-gold);
         }
-        .nav-logo img {
-            height: 60px; mix-blend-mode: screen; filter: brightness(1.2);
-        }
+        .nav-logo img { height: 60px; mix-blend-mode: screen; filter: brightness(1.2); }
         .nav-links button {
-            background: none; border: none; color: white;
-            font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
-            margin-left: 20px; cursor: pointer; transition: 0.3s;
+            background: none; border: none; color: white; font-size: 14px; letter-spacing: 2px;
+            text-transform: uppercase; margin-left: 20px; cursor: pointer; transition: 0.3s;
         }
         .nav-links button:hover { color: var(--matte-gold); }
 
-        /* --- HERO SECTION --- */
+        /* --- HERO SECTION & WATERMARK CROP --- */
         .hero {
-            position: relative; height: 100vh; width: 100%;
-            display: flex; align-items: center; justify-content: center;
+            position: relative; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center;
             overflow: hidden; text-align: center;
         }
         .hero video {
             position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
-            width: auto; height: auto; z-index: 0; transform: translateX(-50%) translateY(-50%);
-            object-fit: cover; filter: brightness(0.6);
+            /* The scale(1.15) pushes the watermark off the edge of the screen! */
+            transform: translateX(-50%) translateY(-50%) scale(1.15); 
+            object-fit: cover; filter: brightness(0.6); z-index: 0;
         }
         .hero-content { position: relative; z-index: 1; color: white; padding: 20px; }
         .hero h1 { font-size: 48px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px; color: var(--matte-gold); }
         .hero p { font-size: 18px; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6; }
-        .hero-btn {
-            background-color: var(--burgundy); color: white; padding: 15px 40px;
-            border: 1px solid var(--burgundy); font-size: 14px; letter-spacing: 2px;
-            text-transform: uppercase; cursor: pointer; transition: 0.3s;
-        }
+        .hero-btn { background-color: var(--burgundy); color: white; padding: 15px 40px; border: 1px solid var(--burgundy); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
         .hero-btn:hover { background-color: transparent; border: 1px solid var(--matte-gold); color: var(--matte-gold); }
 
-        /* --- CATALOG & GALLERY --- */
+        /* --- SECTIONS --- */
         .section-container { padding: 80px 40px; text-align: center; }
         .section-container h2 { font-size: 32px; color: var(--burgundy); letter-spacing: 3px; margin-bottom: 15px; text-transform: uppercase; }
         .section-desc { max-width: 700px; margin: 0 auto 40px auto; color: #555; line-height: 1.6; font-size: 16px; }
         
+        /* About Section */
+        .about-grid { display: flex; max-width: 1000px; margin: 0 auto; text-align: left; gap: 40px; align-items: center; }
+        .about-text { flex: 1; font-size: 16px; line-height: 1.8; color: #444; }
+        .about-text strong { color: var(--burgundy); }
+
+        /* Catalog Grid */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
-        
-        /* Catalog Cards */
         .product-card { background: white; border: 1px solid #eaeaea; transition: 0.3s; text-align: left; }
         .product-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.05); transform: translateY(-5px); border-color: var(--matte-gold); }
         .product-img { width: 100%; height: 250px; background: #eee; object-fit: cover; }
         .product-info { padding: 20px; }
         .product-title { font-size: 16px; font-weight: bold; margin: 0 0 10px 0; color: var(--charcoal); }
         .product-price { font-size: 18px; color: var(--burgundy); margin: 0 0 15px 0; }
-        .add-to-cart {
-            width: 100%; padding: 12px; background: var(--charcoal); color: var(--matte-gold);
-            border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: bold; transition: 0.3s;
-        }
+        .add-to-cart { width: 100%; padding: 12px; background: var(--charcoal); color: var(--matte-gold); border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: bold; transition: 0.3s; }
         .add-to-cart:hover { background: var(--burgundy); color: white; }
 
-        /* Lookbook Masonry */
-        .lookbook-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto;
-        }
+        /* Lookbook */
+        .lookbook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
         .lookbook-img { width: 100%; height: 350px; object-fit: cover; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
         #loading-msg { text-align: center; font-size: 18px; color: var(--matte-gold); }
 
-        /* --- CART & CHECKOUT --- */
-        #cart-modal {
-            display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh;
-            background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 200; flex-direction: column;
-        }
+        /* --- MODALS (CART & AUTH) --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.7); z-index: 200; justify-content: center; align-items: center; }
+        .auth-box { background: white; padding: 40px; border-radius: 8px; width: 350px; text-align: center; position: relative; }
+        .auth-box input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; }
+        .auth-box button { width: 100%; padding: 15px; background: var(--charcoal); color: var(--matte-gold); border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .auth-box button:hover { background: var(--burgundy); color: white; }
+        .auth-switch { margin-top: 15px; font-size: 14px; color: #666; cursor: pointer; text-decoration: underline; }
+
+        #cart-modal { display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 200; flex-direction: column; }
         .cart-header { background: var(--charcoal); color: var(--matte-gold); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .cart-header h3 { margin: 0; letter-spacing: 2px; }
-        .close-cart { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
         .cart-items { flex-grow: 1; padding: 20px; overflow-y: auto; }
         .cart-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .checkout-section { padding: 20px; border-top: 2px solid var(--matte-gold); background: var(--light-bg); }
         .checkout-input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; }
-        .checkout-btn {
-            width: 100%; padding: 15px; background: var(--burgundy); color: white;
-            border: none; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-weight: bold;
-        }
-        .checkout-btn:hover { background: var(--charcoal); color: var(--matte-gold); }
+        .checkout-btn { width: 100%; padding: 15px; background: var(--burgundy); color: white; border: none; font-size: 14px; text-transform: uppercase; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -112,8 +98,10 @@
             <img src="https://raw.githubusercontent.com/henryromanenko-creator/RomanKenoStockManagement/main/Logo.png" alt="Roman Keno">
         </div>
         <div class="nav-links">
+            <button onclick="document.getElementById('about').scrollIntoView()">Heritage</button>
             <button onclick="document.getElementById('catalog').scrollIntoView()">Supplies</button>
             <button onclick="document.getElementById('lookbook').scrollIntoView()">Inspiration</button>
+            <button id="nav-auth-btn" onclick="openAuth()">Login</button>
             <button onclick="openCart()">Cart (<span id="cart-count">0</span>)</button>
         </div>
     </nav>
@@ -130,6 +118,18 @@
         </div>
     </div>
 
+    <!-- ABOUT SECTION -->
+    <div id="about" class="section-container" style="background-color: white;">
+        <h2>Brand Heritage</h2>
+        <div class="about-grid">
+            <div class="about-text">
+                <p><strong>Roman Keno</strong> was born from the benches of custom-made, bespoke jewelry workshops. For years, we poured our passion into crafting finished, high-end pieces for private clientele, learning the intimate language of metal, plating, and stone.</p>
+                <p>Through this journey, we discovered a gap in the market: independent creators and boutique designers struggled to find reliable, premium-grade components without astronomical markups. We pivoted our expertise. Today, we bridge the gap between European artistry and practical cost-effectiveness.</p>
+                <p>We source, verify, and curate only the finest materials—ensuring that every jump ring, chain, and clasp meets the rigorous standards of a master jeweler, making luxury accessible to creators worldwide.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- CATALOG GRID -->
     <div id="catalog" class="section-container">
         <h2>The Material Archive</h2>
@@ -138,12 +138,34 @@
         <div class="grid" id="product-grid"></div>
     </div>
 
-    <!-- INSPIRATION GALLERY (LOOKBOOK) -->
+    <!-- INSPIRATION GALLERY -->
     <div id="lookbook" class="section-container" style="background-color: white;">
         <h2>The Artisan's Lookbook</h2>
-        <p class="section-desc">Witness the alchemy of raw materials transformed into wearable art. These finished pieces—crafted utilizing the exact components available in our collection—serve as a testament to what is possible. Let these designs ignite your imagination and elevate your next creation.</p>
-        <div class="lookbook-grid" id="gallery-grid">
-            <!-- Images inject here -->
+        <p class="section-desc">Witness the alchemy of raw materials transformed into wearable art. These finished pieces—crafted utilizing the exact components available in our collection—serve as a testament to what is possible.</p>
+        <div class="lookbook-grid" id="gallery-grid"></div>
+    </div>
+
+    <!-- AUTHENTICATION MODAL -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="auth-box" id="login-box">
+            <button style="position:absolute; top:10px; right:10px; background:none; color:black; width:auto; padding:0;" onclick="closeAuth()">✕</button>
+            <h2 style="color:var(--burgundy); margin-top:0;">Account Login</h2>
+            <input type="email" id="log-email" placeholder="Email Address">
+            <input type="password" id="log-pass" placeholder="Password">
+            <button onclick="loginUser()" id="btn-login">Sign In</button>
+            <p id="log-msg" style="font-size:14px; font-weight:bold;"></p>
+            <div class="auth-switch" onclick="toggleAuthMode('register')">Don't have an account? Register here.</div>
+        </div>
+
+        <div class="auth-box" id="reg-box" style="display:none;">
+            <button style="position:absolute; top:10px; right:10px; background:none; color:black; width:auto; padding:0;" onclick="closeAuth()">✕</button>
+            <h2 style="color:var(--burgundy); margin-top:0;">Create Account</h2>
+            <input type="email" id="reg-email" placeholder="Email Address">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <input type="text" id="reg-ship" placeholder="Default Shipping Address">
+            <button onclick="registerUser()" id="btn-reg">Register</button>
+            <p id="reg-msg" style="font-size:14px; font-weight:bold;"></p>
+            <div class="auth-switch" onclick="toggleAuthMode('login')">Already have an account? Sign in.</div>
         </div>
     </div>
 
@@ -151,7 +173,7 @@
     <div id="cart-modal">
         <div class="cart-header">
             <h3>YOUR ORDER</h3>
-            <button class="close-cart" onclick="closeCart()">✕</button>
+            <button class="close-cart" onclick="closeCart()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">✕</button>
         </div>
         <div class="cart-items" id="cart-items-container">
             <p style="text-align:center; color:#888;">Your cart is empty.</p>
@@ -160,38 +182,106 @@
             <h3 style="margin-top:0; color:var(--charcoal);">Total: £<span id="cart-total">0.00</span></h3>
             <input type="email" id="chk-email" class="checkout-input" placeholder="Email Address" required>
             <input type="text" id="chk-shipping" class="checkout-input" placeholder="Shipping Address" required>
-            <button class="checkout-btn" onclick="processMockCheckout()" id="btn-checkout">Pay with Tide / Card (Mock)</button>
+            <button class="checkout-btn" onclick="processMockCheckout()" id="btn-checkout">Pay with Tide / Card</button>
             <div id="checkout-msg" style="margin-top:10px; font-weight:bold; text-align:center;"></div>
         </div>
     </div>
 
     <script>
-        // === YOUR LIVE GOOGLE APPS SCRIPT WEB APP URL ===
         const API_URL = "https://script.google.com/macros/s/AKfycbzpUweCFWDQwOLCLAS3ZgOWIrGywxuOuh4H7gvS6QfjW4W9Oxqa_UJoIlqqNcy96uM_/exec";
         
         let catalogData = [];
         let cart = [];
+        let currentUser = null;
 
-        // 1. Fetch Catalog & Gallery on Load
+        // 1. Init
         window.onload = async () => {
+            checkLoginState();
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 
-                // Process Catalog
                 catalogData = data.catalog.filter(item => item["SKU / Set ID"] !== "" && Number(item["Live Stock"]) > 0);
                 renderCatalog();
 
-                // Process Gallery
-                if(data.gallery && data.gallery.length > 0) {
-                    renderGallery(data.gallery);
-                }
+                if(data.gallery && data.gallery.length > 0) renderGallery(data.gallery);
             } catch (err) {
                 document.getElementById('loading-msg').innerText = "Error loading collection. Please try again later.";
             }
         };
 
-        // 2. Render Products
+        // --- AUTHENTICATION LOGIC ---
+        function checkLoginState() {
+            const savedUser = localStorage.getItem('rk_user');
+            if(savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('nav-auth-btn').innerText = "Logout";
+                document.getElementById('nav-auth-btn').onclick = logoutUser;
+                // Prefill checkout
+                document.getElementById('chk-email').value = currentUser.email;
+                document.getElementById('chk-shipping').value = currentUser.shipping || "";
+            } else {
+                currentUser = null;
+                document.getElementById('nav-auth-btn').innerText = "Login";
+                document.getElementById('nav-auth-btn').onclick = openAuth;
+                document.getElementById('chk-email').value = "";
+                document.getElementById('chk-shipping').value = "";
+            }
+        }
+
+        function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
+        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+        function toggleAuthMode(mode) {
+            document.getElementById('login-box').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('reg-box').style.display = mode === 'register' ? 'block' : 'none';
+        }
+        function logoutUser() { localStorage.removeItem('rk_user'); checkLoginState(); alert("Logged out successfully."); }
+
+        async function loginUser() {
+            const email = document.getElementById('log-email').value;
+            const pass = document.getElementById('log-pass').value;
+            const msg = document.getElementById('log-msg');
+            const btn = document.getElementById('btn-login');
+            
+            if(!email || !pass) return msg.innerText = "Please fill all fields.";
+            btn.innerText = "Authenticating..."; msg.innerText = "";
+            
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: email, password: pass }) });
+                const result = await res.json();
+                if(result.success) {
+                    localStorage.setItem('rk_user', JSON.stringify({ email: result.email, shipping: result.shipping }));
+                    checkLoginState();
+                    closeAuth();
+                } else { msg.innerText = result.message; msg.style.color = "red"; }
+            } catch(e) { msg.innerText = "Connection error."; }
+            btn.innerText = "Sign In";
+        }
+
+        async function registerUser() {
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const ship = document.getElementById('reg-ship').value;
+            const msg = document.getElementById('reg-msg');
+            const btn = document.getElementById('btn-reg');
+            
+            if(!email || !pass) return msg.innerText = "Email and Password required.";
+            btn.innerText = "Registering..."; msg.innerText = "";
+            
+            try {
+                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'register', email: email, password: pass, shipping: ship }) });
+                const result = await res.json();
+                if(result.success) {
+                    localStorage.setItem('rk_user', JSON.stringify({ email: result.email, shipping: result.shipping }));
+                    checkLoginState();
+                    closeAuth();
+                    alert("Account created successfully!");
+                } else { msg.innerText = result.message; msg.style.color = "red"; }
+            } catch(e) { msg.innerText = "Connection error."; }
+            btn.innerText = "Register";
+        }
+
+        // --- RENDER LOGIC ---
         function renderCatalog() {
             const grid = document.getElementById('product-grid');
             document.getElementById('loading-msg').style.display = 'none';
@@ -215,26 +305,22 @@
             });
         }
 
-        // 3. Render Lookbook Gallery
         function renderGallery(images) {
             const galleryGrid = document.getElementById('gallery-grid');
             galleryGrid.innerHTML = '';
             images.forEach(imgUrl => {
                 const img = document.createElement('img');
-                img.src = imgUrl;
-                img.className = 'lookbook-img';
-                img.alt = 'Roman Keno Finished Artisan Jewelry';
+                img.src = imgUrl; img.className = 'lookbook-img'; img.alt = 'Artisan Jewelry';
                 galleryGrid.appendChild(img);
             });
         }
 
-        // 4. Cart Logic
+        // --- CART LOGIC ---
         function addToCart(sku, name, price) {
             const existingItem = cart.find(i => i.sku === sku);
             if (existingItem) { existingItem.qty += 1; } 
             else { cart.push({ sku, name, price, qty: 1 }); }
-            updateCartUI();
-            openCart();
+            updateCartUI(); openCart();
         }
 
         function updateCartUI() {
@@ -264,7 +350,7 @@
         function openCart() { document.getElementById('cart-modal').style.display = 'flex'; }
         function closeCart() { document.getElementById('cart-modal').style.display = 'none'; }
 
-        // 5. Mock Checkout
+        // --- CHECKOUT LOGIC ---
         async function processMockCheckout() {
             if (cart.length === 0) return alert("Cart is empty!");
             
@@ -281,17 +367,15 @@
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ email: email, shipping: shipping, total: total, cart: cart })
+                    body: JSON.stringify({ action: 'checkout', email: email, shipping: shipping, total: total, cart: cart })
                 });
                 const result = await response.json();
                 
                 if (result.success) {
                     msg.style.color = "green"; msg.innerText = `Success! Order ID: ${result.orderId}`;
                     cart = []; updateCartUI();
-                    setTimeout(() => { closeCart(); msg.innerText = ""; btn.innerText = "Pay with Tide / Card (Mock)"; btn.disabled = false; }, 3000);
-                } else {
-                    throw new Error(result.message);
-                }
+                    setTimeout(() => { closeCart(); msg.innerText = ""; btn.innerText = "Pay with Tide / Card"; btn.disabled = false; }, 3000);
+                } else throw new Error(result.message);
             } catch (err) {
                 msg.style.color = "red"; msg.innerText = "Error: " + err.message;
                 btn.innerText = "Try Again"; btn.disabled = false;
