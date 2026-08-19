@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roman Keno Admin</title>
   <style>
+    /* same CSS as before (abbreviated for brevity, full CSS copied from previous) */
     :root {
       --charcoal: #1a1a1a;
       --burgundy: #5c001e;
@@ -14,91 +15,20 @@
       --error: #b00020;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      background: var(--charcoal);
-      color: var(--cream);
-      min-height: 100vh;
-      display: flex;
-    }
-    .sidebar {
-      width: 240px;
-      background: var(--burgundy);
-      padding: 2rem 1rem;
-      position: fixed;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .sidebar h1 {
-      font-size: 1.6rem;
-      color: var(--gold);
-      margin-bottom: 2rem;
-      text-align: center;
-      letter-spacing: 2px;
-    }
-    .sidebar button {
-      background: transparent;
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      padding: 0.8rem 1rem;
-      cursor: pointer;
-      text-align: left;
-      font-size: 0.95rem;
-      transition: all 0.3s;
-    }
-    .sidebar button:hover, .sidebar button.active {
-      background: var(--gold);
-      color: var(--charcoal);
-    }
-    .main {
-      margin-left: 240px;
-      padding: 2rem;
-      flex: 1;
-    }
+    body { font-family: 'Georgia', 'Times New Roman', serif; background: var(--charcoal); color: var(--cream); min-height: 100vh; display: flex; }
+    .sidebar { width: 240px; background: var(--burgundy); padding: 2rem 1rem; position: fixed; height: 100vh; display: flex; flex-direction: column; gap: 0.5rem; }
+    .sidebar h1 { font-size: 1.6rem; color: var(--gold); margin-bottom: 2rem; text-align: center; letter-spacing: 2px; }
+    .sidebar button { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 0.8rem 1rem; cursor: pointer; text-align: left; font-size: 0.95rem; transition: all 0.3s; }
+    .sidebar button:hover, .sidebar button.active { background: var(--gold); color: var(--charcoal); }
+    .main { margin-left: 240px; padding: 2rem; flex: 1; }
     .module { display: none; }
     .module.active { display: block; }
-    h2 {
-      color: var(--gold);
-      margin-bottom: 1.5rem;
-      font-weight: normal;
-      letter-spacing: 1px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 2rem;
-      background: #222;
-    }
-    th, td {
-      padding: 0.7rem;
-      text-align: left;
-      border-bottom: 1px solid #333;
-      font-size: 0.9rem;
-    }
-    th {
-      background: var(--burgundy);
-      color: var(--gold);
-    }
-    input[type="text"], input[type="number"], input[type="password"], textarea, select {
-      width: 100%;
-      padding: 0.6rem;
-      background: #2a2a2a;
-      color: var(--cream);
-      border: 1px solid #444;
-      margin-bottom: 0.8rem;
-    }
-    button {
-      background: var(--gold);
-      color: var(--charcoal);
-      border: none;
-      padding: 0.7rem 1.2rem;
-      cursor: pointer;
-      font-weight: bold;
-      letter-spacing: 1px;
-      transition: opacity 0.3s;
-    }
+    h2 { color: var(--gold); margin-bottom: 1.5rem; font-weight: normal; letter-spacing: 1px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; background: #222; }
+    th, td { padding: 0.7rem; text-align: left; border-bottom: 1px solid #333; font-size: 0.9rem; }
+    th { background: var(--burgundy); color: var(--gold); }
+    input[type="text"], input[type="number"], input[type="password"], textarea, select { width: 100%; padding: 0.6rem; background: #2a2a2a; color: var(--cream); border: 1px solid #444; margin-bottom: 0.8rem; }
+    button { background: var(--gold); color: var(--charcoal); border: none; padding: 0.7rem 1.2rem; cursor: pointer; font-weight: bold; letter-spacing: 1px; transition: opacity 0.3s; }
     button:hover { opacity: 0.8; }
     .btn-danger { background: var(--error); color: white; }
     .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
@@ -107,68 +37,18 @@
     .gallery { display: flex; flex-wrap: wrap; gap: 1rem; }
     .gallery img { width: 150px; height: 150px; object-fit: cover; border: 2px solid var(--gold); }
     .message { padding: 1rem; margin: 1rem 0; background: #2a2a2a; border-left: 4px solid var(--gold); }
-    .login-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: var(--charcoal);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-    .login-box {
-      background: var(--burgundy);
-      padding: 2rem;
-      border: 1px solid var(--gold);
-      width: 350px;
-      text-align: center;
-    }
-    .login-box input {
-      width: 100%;
-      padding: 0.8rem;
-      margin-bottom: 1rem;
-      background: #2a2a2a;
-      color: var(--cream);
-      border: 1px solid #444;
-    }
-    .login-box button {
-      background: var(--gold);
-      color: var(--charcoal);
-      padding: 0.8rem 1.5rem;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      z-index: 200;
-      justify-content: center;
-      align-items: center;
-    }
+    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--charcoal); display: flex; justify-content: center; align-items: center; z-index: 999; }
+    .login-box { background: var(--burgundy); padding: 2rem; border: 1px solid var(--gold); width: 350px; text-align: center; }
+    .login-box input { width: 100%; padding: 0.8rem; margin-bottom: 1rem; background: #2a2a2a; color: var(--cream); border: 1px solid #444; }
+    .login-box button { background: var(--gold); color: var(--charcoal); padding: 0.8rem 1.5rem; border: none; cursor: pointer; font-weight: bold; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
     .modal.active { display: flex; }
-    .modal-content {
-      background: var(--charcoal);
-      padding: 2rem;
-      width: 400px;
-      max-width: 90%;
-      border: 1px solid var(--gold);
-    }
-    .modal-content input, .modal-content textarea {
-      width: 100%;
-      padding: 0.8rem;
-      margin-bottom: 1rem;
-      background: var(--gray, #2a2a2a);
-      border: 1px solid #444;
-      color: var(--cream);
-    }
+    .modal-content { background: var(--charcoal); padding: 2rem; width: 400px; max-width: 90%; border: 1px solid var(--gold); }
+    .modal-content input, .modal-content textarea { width: 100%; padding: 0.8rem; margin-bottom: 1rem; background: var(--gray, #2a2a2a); border: 1px solid #444; color: var(--cream); }
   </style>
 </head>
 <body>
+  <!-- Login overlay -->
   <div id="login-overlay" class="login-overlay">
     <div class="login-box">
       <h2 style="color: var(--gold);">Roman Keno Admin</h2>
@@ -178,6 +58,7 @@
     </div>
   </div>
 
+  <!-- Sidebar -->
   <div class="sidebar" id="sidebar" style="display:none;">
     <h1>ROMAN KENO</h1>
     <button data-module="stock" class="active">📦 Stock Management</button>
@@ -188,6 +69,7 @@
     <button data-module="content">✏️ Content Editor</button>
   </div>
 
+  <!-- Main content -->
   <div class="main" id="main" style="display:none;">
     <!-- STOCK MODULE -->
     <div id="module-stock" class="module active">
@@ -320,7 +202,7 @@
   </div>
 
   <script>
-    const API_BASE = 'https://script.google.com/macros/s/AKfycbwSARlMjuvqeL3dd6yEwZtCSkORAP6CgdeEY3jZW6YeyzZl-PQjasHOmVJ2cgp69DrxsA/exec';
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbxPQub5Ce5ohWuYhjrkqM7ByOm5V9LpBiqQiATBSJWSJomygpCCsv22ecCV-jNES5xh/exec';
     let adminKey = sessionStorage.getItem('adminKey') || '';
     let stockData = [];
     let setsData = [];
@@ -359,13 +241,37 @@
       setTimeout(() => div.remove(), 3000);
     }
 
+    // API helper that uses GET for normal actions and POST for upload actions
     async function apiCall(action, params = {}) {
       const url = new URL(API_BASE);
-      url.searchParams.append('action', action);
-      url.searchParams.append('adminKey', adminKey);
-      Object.entries(params).forEach(([key, value]) => {
-        url.searchParams.append(key, value);
-      });
+      const isUploadAction = ['uploadImage', 'uploadLookbookImage', 'uploadSetImage'].includes(action);
+      const method = isUploadAction ? 'POST' : 'GET';
+      const headers = { 'Content-Type': 'application/json' };
+
+      if (method === 'GET') {
+        url.searchParams.append('action', action);
+        url.searchParams.append('adminKey', adminKey);
+        Object.entries(params).forEach(([key, value]) => {
+          url.searchParams.append(key, value);
+        });
+      } else {
+        // For POST, we still include action and adminKey in query string for ease
+        url.searchParams.append('action', action);
+        url.searchParams.append('adminKey', adminKey);
+        // But data goes into JSON body
+        // We'll merge params into body
+        const body = JSON.stringify(params);
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: body,
+          cache: 'no-store'
+        });
+        const data = await response.json();
+        if (data && data.success === false) throw new Error(data.error || 'API error');
+        return data;
+      }
+
       const response = await fetch(url, { cache: 'no-store' });
       const data = await response.json();
       if (data && data.success === false) throw new Error(data.error || 'API error');
@@ -738,29 +644,6 @@
       } catch (err) { showMessage('Error loading lookbook: ' + err.message); }
     }
 
-    async function uploadLookbookImages() {
-      const files = document.getElementById('lookbook-files').files;
-      if (files.length === 0) return showMessage('No files selected');
-      for (const file of files) {
-        try {
-          const result = await uploadImage(file);
-          await apiCall('uploadLookbookImage', { dataUrl: '', fileName: file.name }); // we'll send URL separately? Actually we need to use result.url
-          // Since uploadLookbookImage expects dataUrl, but we already uploaded via generic uploadImage.
-          // We can adjust backend to accept URL; for now, call differently:
-          // Directly use uploadImage result and then save to Site_Content via backend.
-          // But backend uploadLookbookImage currently does its own upload. We'll instead call saveSiteContent? No.
-          // Simpler: call generic uploadImage then add to Site_Content via saveSiteContent? Not ideal.
-          // For simplicity, I'll modify uploadLookbookImage in backend to accept optional URL and just store.
-          // But already provided backend has uploadLookbookImage doing drive upload. We can use it directly.
-          // We'll call apiCall('uploadLookbookImage', { dataUrl: reader.result, fileName: file.name }) as before.
-          // But our uploadImage is for other uses. To keep consistent, I'll add a separate function for lookbook that uses FileReader directly.
-        } catch (err) { showMessage('Upload failed: ' + err.message); }
-      }
-      loadLookbook();
-    }
-
-    // For lookbook, we'll use a different approach: read file and call uploadLookbookImage directly.
-    // Override uploadLookbookImages to avoid generic uploadImage:
     async function uploadLookbookImages() {
       const files = document.getElementById('lookbook-files').files;
       if (files.length === 0) return showMessage('No files selected');
