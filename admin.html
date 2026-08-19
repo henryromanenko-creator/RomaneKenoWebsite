@@ -105,7 +105,9 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .card { background: #222; padding: 1.5rem; border: 1px solid #333; }
     .gallery { display: flex; flex-wrap: wrap; gap: 1rem; }
-    .gallery img { width: 150px; height: 150px; object-fit: cover; border: 2px solid var(--gold); }
+    .lookbook-item { position: relative; width: 150px; }
+    .lookbook-item img { width: 150px; height: 150px; object-fit: cover; border: 2px solid var(--gold); }
+    .lookbook-item .btn-danger { position: absolute; bottom: 5px; left: 5px; padding: 0.3rem 0.6rem; font-size: 0.7rem; }
     .message { padding: 1rem; margin: 1rem 0; background: #2a2a2a; border-left: 4px solid var(--gold); }
     .login-overlay {
       position: fixed;
@@ -321,7 +323,7 @@
   </div>
 
   <script>
-    const API_BASE = 'https://script.google.com/macros/s/AKfycbxWo9exIbkeh8N-_IRHREqcPiAj1quPj-NpHMMz5s_8K7aF1M0Tj3kGFfLFRS713Te76g/exec';
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbyPKotHz7GShmocCJgqpc0dsGzsKRQ4pFfhcEjtcMKlU9KdxLw0zHx5jR7HtAkZ2Uc_iQ/exec';
     let adminKey = sessionStorage.getItem('adminKey') || '';
     let stockData = [];
     let setsData = [];
@@ -752,7 +754,16 @@
       try {
         const images = await apiCall('getLookbookImagesAdmin');
         const gallery = document.getElementById('lookbook-gallery');
-        gallery.innerHTML = images.map(img => `<img src="${img['Content URL/Text']}" alt="Lookbook">`).join('');
+        if (images.length === 0) {
+          gallery.innerHTML = '<p>No images yet.</p>';
+          return;
+        }
+        gallery.innerHTML = images.map(img => `
+          <div class="lookbook-item">
+            <img src="${img['Content URL/Text']}" alt="Artisan Piece">
+            <button class="btn-danger" onclick="deleteLookbookImage(this)" data-url="${img['Content URL/Text']}">Delete</button>
+          </div>
+        `).join('');
       } catch (err) { showMessage('Error loading lookbook: ' + err.message); }
     }
 
@@ -770,6 +781,17 @@
         };
         reader.readAsDataURL(file);
       }
+    }
+
+    // === DELETE LOOKBOOK IMAGE ===
+    async function deleteLookbookImage(btn) {
+      const url = btn.getAttribute('data-url');
+      if (!confirm('Delete this lookbook image?')) return;
+      try {
+        await apiCall('deleteLookbookImage', { imageUrl: url });
+        showMessage('Image deleted');
+        loadLookbook();
+      } catch (err) { showMessage('Delete failed: ' + err.message); }
     }
 
     // === TEST UPLOAD ===
