@@ -1,535 +1,414 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roman Keno | Luxury Artisan Supplies</title>
-    <style>
-        :root {
-            --burgundy: #5c001e;
-            --charcoal: #1a1a1a;
-            --matte-gold: #c5a059;
-            --light-bg: #fafafa;
-        }
-        body, html {
-            margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--light-bg); color: var(--charcoal); scroll-behavior: smooth;
-        }
-
-        /* --- NAVIGATION --- */
-        nav {
-            position: fixed; width: 100%; top: 0; z-index: 100; background-color: rgba(26, 26, 26, 0.98);
-            display: flex; justify-content: space-between; align-items: center; padding: 10px 40px; box-sizing: border-box;
-            border-bottom: 1px solid var(--matte-gold);
-        }
-        .nav-logo img { height: 60px; mix-blend-mode: screen; filter: brightness(1.2); }
-        .nav-links button {
-            background: none; border: none; color: white; font-size: 14px; letter-spacing: 2px;
-            text-transform: uppercase; margin-left: 20px; cursor: pointer; transition: 0.3s;
-        }
-        .nav-links button:hover { color: var(--matte-gold); }
-
-        /* --- HERO SECTION & WATERMARK CROP --- */
-        .hero {
-            position: relative; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center;
-            overflow: hidden; text-align: center;
-        }
-        .hero video {
-            position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
-            transform: translateX(-50%) translateY(-50%) scale(1.15); 
-            object-fit: cover; filter: brightness(0.6); z-index: 0;
-        }
-        .hero-content { position: relative; z-index: 1; color: white; padding: 20px; }
-        .hero h1 { font-size: 48px; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px; color: var(--matte-gold); }
-        .hero p { font-size: 18px; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6; }
-        .hero-btn { background-color: var(--burgundy); color: white; padding: 15px 40px; border: 1px solid var(--burgundy); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
-        .hero-btn:hover { background-color: transparent; border: 1px solid var(--matte-gold); color: var(--matte-gold); }
-
-        /* --- SECTIONS --- */
-        .section-container { padding: 80px 40px; text-align: center; }
-        .section-container h2 { font-size: 32px; color: var(--burgundy); letter-spacing: 3px; margin-bottom: 15px; text-transform: uppercase; }
-        .section-desc { max-width: 700px; margin: 0 auto 40px auto; color: #555; line-height: 1.6; font-size: 16px; }
-        
-        /* About Section */
-        .about-grid { display: flex; max-width: 1000px; margin: 0 auto; text-align: left; gap: 40px; align-items: center; }
-        .about-text { flex: 1; font-size: 16px; line-height: 1.8; color: #444; }
-        .about-text strong { color: var(--burgundy); }
-
-        /* Catalog Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
-        .product-card { background: white; border: 1px solid #eaeaea; transition: 0.3s; text-align: left; cursor: pointer; }
-        .product-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.05); transform: translateY(-5px); border-color: var(--matte-gold); }
-        .product-img { width: 100%; height: 250px; background: #eee; object-fit: cover; }
-        .product-info { padding: 20px; }
-        .product-title { font-size: 16px; font-weight: bold; margin: 0 0 10px 0; color: var(--charcoal); }
-        .product-price { font-size: 18px; color: var(--burgundy); margin: 0 0 15px 0; }
-        .add-to-cart { width: 100%; padding: 12px; background: var(--charcoal); color: var(--matte-gold); border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: bold; transition: 0.3s; }
-        .add-to-cart:hover { background: var(--burgundy); color: white; }
-
-        /* --- REDESIGNED CINEMATIC LOOKBOOK SECTION --- */
-        .lookbook-section {
-            background-color: #0f0f0f; color: #ffffff; padding: 100px 40px; text-align: center;
-            border-top: 2px solid var(--matte-gold); border-bottom: 2px solid var(--matte-gold);
-        }
-        .lookbook-section h2 { font-size: 36px; color: var(--matte-gold); letter-spacing: 4px; margin-bottom: 15px; text-transform: uppercase; }
-        .lookbook-section .section-desc { color: #aaa; max-width: 750px; margin: 0 auto 50px auto; font-size: 16px; }
-
-        .lookbook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; max-width: 1300px; margin: 0 auto; }
-        .lookbook-item {
-            position: relative; overflow: hidden; border-radius: 6px; background: #1a1a1a;
-            border: 1px solid rgba(197, 160, 89, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-        }
-        .lookbook-item:hover {
-            transform: translateY(-8px); border-color: var(--matte-gold);
-            box-shadow: 0 15px 40px rgba(197, 160, 89, 0.25);
-        }
-        .lookbook-media {
-            width: 100%; height: 360px; object-fit: cover; display: block;
-            transition: transform 0.6s ease;
-        }
-        .lookbook-item:hover .lookbook-media { transform: scale(1.06); }
-        
-        /* Lightbox Modal */
-        #lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.92); z-index: 300; justify-content: center; align-items: center; cursor: pointer; }
-        #lightbox-img { max-width: 90%; max-height: 90vh; border-radius: 4px; box-shadow: 0 5px 30px rgba(0,0,0,0.8); border: 1px solid var(--matte-gold); }
-
-        #loading-msg { text-align: center; font-size: 18px; color: var(--matte-gold); }
-
-        /* --- MODALS (PDP, CART, AUTH) --- */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.7); z-index: 200; justify-content: center; align-items: center; }
-        
-        .pdp-content { background: white; padding: 30px; border-radius: 8px; width: 800px; max-width: 90%; display: flex; gap: 30px; position: relative; flex-wrap: wrap; text-align: left; color: var(--charcoal); }
-        .pdp-images { flex: 1; min-width: 280px; }
-        .pdp-main-img { width: 100%; height: 320px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; margin-bottom: 10px; }
-        .pdp-thumbs { display: flex; gap: 10px; }
-        .pdp-thumb { width: 60px; height: 60px; object-fit: cover; cursor: pointer; border: 2px solid transparent; border-radius: 4px; }
-        .pdp-thumb.active { border-color: var(--matte-gold); }
-        .pdp-details { flex: 1; min-width: 280px; display: flex; flex-direction: column; justify-content: center; }
-        
-        .auth-box { background: white; padding: 40px; border-radius: 8px; width: 350px; text-align: center; position: relative; color: var(--charcoal); }
-        .auth-box input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; }
-        .auth-box button { width: 100%; padding: 15px; background: var(--charcoal); color: var(--matte-gold); border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .auth-box button:hover { background: var(--burgundy); color: white; }
-        .auth-switch { margin-top: 15px; font-size: 14px; color: #666; cursor: pointer; text-decoration: underline; }
-
-        #cart-modal { display: none; position: fixed; top: 0; right: 0; width: 400px; height: 100vh; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.1); z-index: 200; flex-direction: column; color: var(--charcoal); }
-        .cart-header { background: var(--charcoal); color: var(--matte-gold); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .cart-items { flex-grow: 1; padding: 20px; overflow-y: auto; }
-        .cart-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .checkout-section { padding: 20px; border-top: 2px solid var(--matte-gold); background: var(--light-bg); }
-        .checkout-input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; }
-        .checkout-btn { width: 100%; padding: 15px; background: var(--burgundy); color: white; border: none; font-size: 14px; text-transform: uppercase; cursor: pointer; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roman Keno | Artisan Jewelry Supplies & Handmade Pieces</title>
+  <style>
+    /* Copy the same CSS from Store.html here — unchanged */
+    :root {
+      --charcoal: #1a1a1a;
+      --burgundy: #5c001e;
+      --gold: #c5a059;
+      --gold-light: #e2c28b;
+      --cream: #f5f1e8;
+      --gray: #2a2a2a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--charcoal);
+      color: var(--cream);
+      scroll-behavior: smooth;
+    }
+    a { color: var(--gold); text-decoration: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      background: rgba(26,26,26,0.95);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--gold);
+    }
+    nav .logo {
+      font-size: 1.8rem;
+      letter-spacing: 3px;
+      color: var(--gold);
+      font-weight: bold;
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+    nav ul li a {
+      color: var(--cream);
+      letter-spacing: 1px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    nav ul li a:hover { color: var(--gold); }
+    .hero {
+      height: 80vh;
+      background: linear-gradient(rgba(26,26,26,0.7), rgba(26,26,26,0.7)), url('https://images.unsplash.com/photo-1617038220319-276d3cfab638?q=80&w=2070&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 4rem;
+      color: var(--gold);
+      letter-spacing: 5px;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.3rem;
+      max-width: 600px;
+      margin: 0 auto;
+      color: var(--cream);
+      font-style: italic;
+    }
+    section { padding: 5rem 0; }
+    h2 {
+      font-size: 2.5rem;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 3rem;
+      letter-spacing: 2px;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+    .product-card {
+      background: var(--gray);
+      border: 1px solid #333;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .product-card:hover { transform: translateY(-5px); }
+    .product-card img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+    }
+    .product-card .info { padding: 1.5rem; }
+    .product-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .product-card .price {
+      color: var(--gold);
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    .gallery img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .gallery img:hover { transform: scale(1.05); }
+    .about-text {
+      max-width: 800px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      text-align: center;
+    }
+    .contact-form {
+      max-width: 500px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .contact-form input, .contact-form textarea {
+      padding: 1rem;
+      background: var(--gray);
+      border: 1px solid #444;
+      color: var(--cream);
+    }
+    .contact-form button {
+      background: var(--gold);
+      color: var(--charcoal);
+      padding: 1rem;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    footer {
+      background: var(--burgundy);
+      padding: 3rem 0;
+      margin-top: 2rem;
+      border-top: 1px solid var(--gold);
+    }
+    footer .footer-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    footer h4 { color: var(--gold); margin-bottom: 1rem; }
+    footer p, footer a { color: var(--cream); font-size: 0.9rem; line-height: 1.8; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--charcoal);
+      padding: 2rem;
+      width: 400px;
+      max-width: 90%;
+      border: 1px solid var(--gold);
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      background: var(--gray);
+      border: 1px solid #444;
+      color: var(--cream);
+    }
+    .modal-content button {
+      background: var(--gold);
+      color: var(--charcoal);
+      padding: 0.8rem 1.5rem;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-auth {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+  <nav>
+    <div class="logo">ROMAN KENO</div>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#supplies">Supplies</a></li>
+      <li><a href="#lookbook">Artisan Jewelry</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><button class="btn-auth" onclick="openAuth('login')">Login</button></li>
+      <li><button class="btn-auth" onclick="openAuth('register')">Register</button></li>
+    </ul>
+  </nav>
 
-    <!-- NAVIGATION -->
-    <nav>
-        <div class="nav-logo">
-            <img src="https://raw.githubusercontent.com/henryromanenko-creator/RomanKenoStockManagement/main/Logo.png" alt="Roman Keno">
-        </div>
-        <div class="nav-links">
-            <button onclick="document.getElementById('about').scrollIntoView()">Heritage</button>
-            <button onclick="document.getElementById('catalog').scrollIntoView()">Supplies</button>
-            <button onclick="document.getElementById('lookbook').scrollIntoView()">Inspiration</button>
-            <button id="nav-auth-btn" onclick="openAuth()">Login</button>
-            <button onclick="openCart()">Cart (<span id="cart-count">0</span>)</button>
-        </div>
-    </nav>
-
-    <!-- HERO BACKGROUND -->
-    <div class="hero">
-        <video autoplay loop muted playsinline>
-            <source src="https://raw.githubusercontent.com/henryromanenko-creator/RomaneKenoWebsite/main/Attached_Assets_Instruction_.mp4" type="video/mp4">
-        </video>
-        <div class="hero-content">
-            <h1>Curated Elegance</h1>
-            <p>Bridging European artistry with accessible, high-end materials for independent creators and boutique designers worldwide.</p>
-            <button class="hero-btn" onclick="document.getElementById('catalog').scrollIntoView()">Explore Collection</button>
-        </div>
+  <div id="home" class="hero">
+    <div>
+      <h1>ROMAN KENO</h1>
+      <p>Meticulous material selection. European boutique quality. Crafted for the uncompromising artisan.</p>
     </div>
+  </div>
 
-    <!-- ABOUT SECTION -->
-    <div id="about" class="section-container" style="background-color: white;">
-        <h2>Brand Heritage</h2>
-        <div class="about-grid">
-            <div class="about-text">
-                <p><strong>Roman Keno</strong> was born from the benches of custom-made, bespoke jewelry workshops. For years, we poured our passion into crafting finished, high-end pieces for private clientele, learning the intimate language of metal, plating, and stone.</p>
-                <p>Through this journey, we discovered a gap in the market: independent creators and boutique designers struggled to find reliable, premium-grade components without astronomical markups. We pivoted our expertise. Today, we bridge the gap between European artistry and practical cost-effectiveness.</p>
-                <p>We source, verify, and curate only the finest materials—ensuring that every jump ring, chain, and clasp meets the rigorous standards of a master jeweler, making luxury accessible to creators worldwide.</p>
+  <section id="supplies">
+    <div class="container">
+      <h2>Curated Supplies</h2>
+      <div id="product-grid" class="product-grid"></div>
+    </div>
+  </section>
+
+  <section id="lookbook">
+    <div class="container">
+      <h2>Artisan Jewelry — The Lookbook</h2>
+      <div id="lookbook-gallery" class="gallery"></div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="container">
+      <h2>About Roman Keno</h2>
+      <div id="about-text" class="about-text"></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <h2>Contact Us</h2>
+      <form class="contact-form" onsubmit="event.preventDefault(); sendContact();">
+        <input type="text" id="contact-name" placeholder="Your Name" required>
+        <input type="email" id="contact-email" placeholder="Your Email" required>
+        <textarea id="contact-message" rows="5" placeholder="Your Message" required></textarea>
+        <button type="submit">Send Message</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <h4>ROMAN KENO</h4>
+          <p>Premium jewelry supplies & artisan pieces.<br>Meticulous material selection.<br>European boutique quality.</p>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <p>ROMAN KENO LTD<br>Company No. 16151952<br>86-90 Paul Street, London, EC2A 4NE, United Kingdom</p>
+        </div>
+        <div>
+          <h4>Links</h4>
+          <a href="#supplies">Supplies</a><br>
+          <a href="#lookbook">Artisan Jewelry</a><br>
+          <a href="#about">About Us</a><br>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+      <p style="text-align:center; margin-top:2rem; opacity:0.7;">© 2026 Roman Keno Ltd. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Auth Modals -->
+  <div id="login-modal" class="modal">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <input type="email" id="login-email" placeholder="Email">
+      <input type="password" id="login-password" placeholder="Password">
+      <button onclick="login()">Login</button>
+      <button class="btn-auth" onclick="closeAuth('login')">Close</button>
+    </div>
+  </div>
+  <div id="register-modal" class="modal">
+    <div class="modal-content">
+      <h2>Register</h2>
+      <input type="text" id="reg-name" placeholder="Full Name">
+      <input type="email" id="reg-email" placeholder="Email">
+      <input type="tel" id="reg-phone" placeholder="Phone">
+      <input type="password" id="reg-password" placeholder="Password">
+      <textarea id="reg-address" placeholder="Shipping Address"></textarea>
+      <button onclick="register()">Register</button>
+      <button class="btn-auth" onclick="closeAuth('register')">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // Replace with your actual Apps Script Web App URL
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbwRQ75xdD_AsMvxo2Ua2h7_FbMni7MYTHk4Fh-VsZDckFojGeqOyII5axk_ZpvcWUPA/exec';
+
+    async function apiCall(action, params = {}) {
+      const url = new URL(API_BASE);
+      url.searchParams.append('action', action);
+      Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, value);
+      });
+      const response = await fetch(url);
+      return response.json();
+    }
+
+    function openAuth(type) {
+      document.getElementById(type + '-modal').classList.add('active');
+    }
+    function closeAuth(type) {
+      document.getElementById(type + '-modal').classList.remove('active');
+    }
+
+    async function loadStoreData() {
+      try {
+        // Load live listings
+        const listings = await apiCall('getLiveListings');
+        const grid = document.getElementById('product-grid');
+        grid.innerHTML = listings.map(l => `
+          <div class="product-card">
+            <img src="${(l['Image URLs'] || '').split(',')[0] || 'https://via.placeholder.com/400'}" alt="${l['Title']}">
+            <div class="info">
+              <h3>${l['Title']}</h3>
+              <p>${l['Description'] || ''}</p>
+              <div class="price">£${l['Selling Price']}</div>
+              <button class="btn-auth" onclick="addToCart('${l['Listing ID']}', '${l['Title']}', ${l['Selling Price']})">Add to Cart</button>
             </div>
-        </div>
-    </div>
+          </div>
+        `).join('');
 
-    <!-- CATALOG GRID -->
-    <div id="catalog" class="section-container">
-        <h2>The Material Archive</h2>
-        <p class="section-desc">Discover our hand-selected inventory of premium European and American jewelry components. Every piece is sourced for durability, brilliance, and flawless design execution.</p>
-        <div id="loading-msg">Summoning the archives...</div>
-        <div class="grid" id="product-grid"></div>
-    </div>
+        // Load lookbook
+        const images = await apiCall('getLookbookImages');
+        const gallery = document.getElementById('lookbook-gallery');
+        gallery.innerHTML = images.map(img => `<img src="${img['Content URL/Text']}" alt="Artisan Piece">`).join('');
 
-    <!-- PRODUCT DETAIL MODAL (PDP) -->
-    <div id="pdp-modal" class="modal-overlay">
-        <div class="pdp-content">
-            <button style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:22px; cursor:pointer;" onclick="closePdp()">✕</button>
-            <div class="pdp-images">
-                <img id="pdp-main-img" class="pdp-main-img" src="" alt="Product Detail">
-                <div class="pdp-thumbs" id="pdp-thumbs-container"></div>
-            </div>
-            <div class="pdp-details">
-                <span id="pdp-sku" style="font-size: 12px; color: #888; letter-spacing: 1px; text-transform: uppercase;"></span>
-                <h2 id="pdp-title" style="margin: 5px 0 15px 0; color: var(--charcoal); font-size: 24px;"></h2>
-                <div id="pdp-price" style="font-size: 22px; color: var(--burgundy); font-weight: bold; margin-bottom: 20px;"></div>
-                <div id="pdp-desc" style="font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 25px;"></div>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <input type="number" id="pdp-qty" value="1" min="1" style="width: 70px; padding: 12px; box-sizing: border-box; text-align: center; font-size: 16px;">
-                    <button class="add-to-cart" id="pdp-add-btn" style="flex-grow: 1; padding: 14px;">Add to Order</button>
-                </div>
-            </div>
-        </div>
-    </div>
+        // Load about
+        const aboutRes = await apiCall('getSiteContent', { type: 'About_Text' });
+        document.getElementById('about-text').textContent = aboutRes.content;
+      } catch (err) {
+        console.error('Error loading store data:', err);
+        alert('Unable to load data. Please try again later.');
+      }
+    }
 
-    <!-- REDESIGNED CINEMATIC LOOKBOOK GALLERY -->
-    <div id="lookbook" class="lookbook-section">
-        <h2>The Artisan's Lookbook</h2>
-        <p class="section-desc">Witness the alchemy of raw materials transformed into wearable art. Explore our curation of cinematic showcases and finished jewelry pieces crafted from our collection.</p>
-        <div class="lookbook-grid" id="gallery-grid"></div>
-    </div>
+    function addToCart(id, title, price) {
+      let cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
+      cart.push({ listingId: id, title, price, qty: 1 });
+      sessionStorage.setItem('cart', JSON.stringify(cart));
+      alert(`Added "${title}" to cart.`);
+    }
 
-    <!-- LIGHTBOX MODAL FOR GALLERY IMAGES -->
-    <div id="lightbox-modal" onclick="closeLightbox()">
-        <img id="lightbox-img" src="" alt="Enlarged Lookbook Piece">
-    </div>
-
-    <!-- AUTHENTICATION MODAL -->
-    <div id="auth-modal" class="modal-overlay">
-        <div class="auth-box" id="login-box">
-            <button style="position:absolute; top:10px; right:10px; background:none; color:black; width:auto; padding:0;" onclick="closeAuth()">✕</button>
-            <h2 style="color:var(--burgundy); margin-top:0;">Account Login</h2>
-            <input type="email" id="log-email" placeholder="Email Address">
-            <input type="password" id="log-pass" placeholder="Password">
-            <button onclick="loginUser()" id="btn-login">Sign In</button>
-            <p id="log-msg" style="font-size:14px; font-weight:bold;"></p>
-            <div class="auth-switch" onclick="toggleAuthMode('register')">Don't have an account? Register here.</div>
-        </div>
-
-        <div class="auth-box" id="reg-box" style="display:none;">
-            <button style="position:absolute; top:10px; right:10px; background:none; color:black; width:auto; padding:0;" onclick="closeAuth()">✕</button>
-            <h2 style="color:var(--burgundy); margin-top:0;">Create Account</h2>
-            <input type="email" id="reg-email" placeholder="Email Address">
-            <input type="password" id="reg-pass" placeholder="Password">
-            <input type="text" id="reg-ship" placeholder="Default Shipping Address">
-            <button onclick="registerUser()" id="btn-reg">Register</button>
-            <p id="reg-msg" style="font-size:14px; font-weight:bold;"></p>
-            <div class="auth-switch" onclick="toggleAuthMode('login')">Already have an account? Sign in.</div>
-        </div>
-    </div>
-
-    <!-- SLIDING CART -->
-    <div id="cart-modal">
-        <div class="cart-header">
-            <h3>YOUR ORDER</h3>
-            <button class="close-cart" onclick="closeCart()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">✕</button>
-        </div>
-        <div class="cart-items" id="cart-items-container">
-            <p style="text-align:center; color:#888;">Your cart is empty.</p>
-        </div>
-        <div class="checkout-section">
-            <h3 style="margin-top:0; color:var(--charcoal);">Total: £<span id="cart-total">0.00</span></h3>
-            <input type="email" id="chk-email" class="checkout-input" placeholder="Email Address" required>
-            <input type="text" id="chk-shipping" class="checkout-input" placeholder="Shipping Address" required>
-            <button class="checkout-btn" onclick="processMockCheckout()" id="btn-checkout">Pay with Tide / Card</button>
-            <div id="checkout-msg" style="margin-top:10px; font-weight:bold; text-align:center;"></div>
-        </div>
-    </div>
-
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzpUweCFWDQwOLCLAS3ZgOWIrGywxuOuh4H7gvS6QfjW4W9Oxqa_UJoIlqqNcy96uM_/exec";
-        
-        let catalogData = [];
-        let cart = [];
-        let currentUser = null;
-
-        // 1. Init
-        window.onload = async () => {
-            checkLoginState();
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                
-                catalogData = data.catalog.filter(item => item["SKU / Set ID"] !== "" && Number(item["Live Stock"]) > 0);
-                renderCatalog();
-
-                const galleryRes = await fetch('lookbook.json');
-                const galleryItems = await galleryRes.json();
-                if(galleryItems && galleryItems.length > 0) {
-                    renderGallery(galleryItems);
-                }
-            } catch (err) {
-                console.error("Error loading collection or lookbook:", err);
-                document.getElementById('loading-msg').innerText = "Error loading collection. Please try again later.";
-            }
-        };
-
-        // --- LOOKBOOK GALLERY LOGIC (Supports both Images and MP4 Videos) ---
-        function renderGallery(items) {
-            const galleryGrid = document.getElementById('gallery-grid');
-            galleryGrid.innerHTML = '';
-            
-            items.forEach(url => {
-                const div = document.createElement('div');
-                div.className = 'lookbook-item';
-                
-                // Check if file is a video (.mp4) or image
-                const isVideo = url.toLowerCase().endsWith('.mp4') || url.toLowerCase().endsWith('.mov');
-                
-                if (isVideo) {
-                    div.innerHTML = `<video src="${url}" autoplay loop muted playsinline class="lookbook-media"></video>`;
-                } else {
-                    div.innerHTML = `<img src="${url}" class="lookbook-media" alt="Artisan Jewelry Piece" onclick="openLightbox('${url}')">`;
-                }
-                
-                galleryGrid.appendChild(div);
-            });
+    async function register() {
+      const data = {
+        name: document.getElementById('reg-name').value,
+        email: document.getElementById('reg-email').value,
+        phone: document.getElementById('reg-phone').value,
+        password: document.getElementById('reg-password').value,
+        address: document.getElementById('reg-address').value
+      };
+      try {
+        const result = await apiCall('registerCustomer', { data: JSON.stringify(data) });
+        if (result.success) {
+          alert('Registration successful. Please login.');
+          closeAuth('register');
+        } else {
+          alert('Registration failed: ' + (result.error || 'Unknown error'));
         }
+      } catch (err) {
+        alert('Registration failed: ' + err.message);
+      }
+    }
 
-        function openLightbox(url) {
-            document.getElementById('lightbox-img').src = url;
-            document.getElementById('lightbox-modal').style.display = 'flex';
+    async function login() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      try {
+        const result = await apiCall('loginCustomer', { email, password });
+        if (result.success) {
+          sessionStorage.setItem('customer', JSON.stringify(result.customer));
+          alert('Login successful');
+          closeAuth('login');
+        } else {
+          alert('Login failed: ' + (result.error || 'Unknown error'));
         }
+      } catch (err) {
+        alert('Login failed: ' + err.message);
+      }
+    }
 
-        function closeLightbox() {
-            document.getElementById('lightbox-modal').style.display = 'none';
-        }
+    function sendContact() {
+      alert('Thank you for your message. We will respond within 24 hours.');
+      document.querySelector('.contact-form').reset();
+    }
 
-        // --- PRODUCT DETAIL MODAL (PDP) LOGIC ---
-        function openPdp(sku) {
-            const item = catalogData.find(i => i["SKU / Set ID"] === sku);
-            if(!item) return;
-
-            document.getElementById('pdp-sku').innerText = `SKU: ${item["SKU / Set ID"]}`;
-            document.getElementById('pdp-title').innerText = item["Product Name"];
-            const price = Number(item["Resale Price"]).toFixed(2);
-            document.getElementById('pdp-price').innerText = `£${price}`;
-
-            let desc = item["Enhanced Description"];
-            if (!desc || desc.trim() === "") {
-                desc = `Expertly curated by Roman Keno, this piece (${item["Product Name"]}) meets the exacting standards of professional independent creators and boutique designers. Sourced for optimal brilliance, structural durability, and seamless integration into custom jewelry assemblies.`;
-            }
-            document.getElementById('pdp-desc').innerText = desc;
-
-            const img1 = item["Image 1 URL"] ? item["Image 1 URL"] : "https://via.placeholder.com/300x250?text=Roman+Keno";
-            const img2 = item["Image 2 URL"] ? item["Image 2 URL"] : "";
-            
-            document.getElementById('pdp-main-img').src = img1;
-            
-            const thumbsContainer = document.getElementById('pdp-thumbs-container');
-            thumbsContainer.innerHTML = '';
-            
-            const t1 = document.createElement('img');
-            t1.src = img1;
-            t1.className = 'pdp-thumb active';
-            t1.onclick = () => { setActivePdpImage(img1, t1); };
-            thumbsContainer.appendChild(t1);
-
-            if(img2) {
-                const t2 = document.createElement('img');
-                t2.src = img2;
-                t2.className = 'pdp-thumb';
-                t2.onclick = () => { setActivePdpImage(img2, t2); };
-                thumbsContainer.appendChild(t2);
-            }
-
-            document.getElementById('pdp-add-btn').onclick = () => {
-                const qty = parseInt(document.getElementById('pdp-qty').value) || 1;
-                addToCartWithOptions(item["SKU / Set ID"], item["Product Name"], price, qty);
-                closePdp();
-            };
-
-            document.getElementById('pdp-modal').style.display = 'flex';
-        }
-
-        function setActivePdpImage(url, thumbElement) {
-            document.getElementById('pdp-main-img').src = url;
-            document.querySelectorAll('.pdp-thumb').forEach(t => t.classList.remove('active'));
-            thumbElement.classList.add('active');
-        }
-
-        function closePdp() {
-            document.getElementById('pdp-modal').style.display = 'none';
-        }
-
-        // --- AUTHENTICATION LOGIC ---
-        function checkLoginState() {
-            const savedUser = localStorage.getItem('rk_user');
-            if(savedUser) {
-                currentUser = JSON.parse(savedUser);
-                document.getElementById('nav-auth-btn').innerText = "Logout";
-                document.getElementById('nav-auth-btn').onclick = logoutUser;
-                document.getElementById('chk-email').value = currentUser.email;
-                document.getElementById('chk-shipping').value = currentUser.shipping || "";
-            } else {
-                currentUser = null;
-                document.getElementById('nav-auth-btn').innerText = "Login";
-                document.getElementById('nav-auth-btn').onclick = openAuth;
-                document.getElementById('chk-email').value = "";
-                document.getElementById('chk-shipping').value = "";
-            }
-        }
-
-        function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
-        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
-        function toggleAuthMode(mode) {
-            document.getElementById('login-box').style.display = mode === 'login' ? 'block' : 'none';
-            document.getElementById('reg-box').style.display = mode === 'register' ? 'block' : 'none';
-        }
-        function logoutUser() { localStorage.removeItem('rk_user'); checkLoginState(); alert("Logged out successfully."); }
-
-        async function loginUser() {
-            const email = document.getElementById('log-email').value;
-            const pass = document.getElementById('log-pass').value;
-            const msg = document.getElementById('log-msg');
-            const btn = document.getElementById('btn-login');
-            
-            if(!email || !pass) return msg.innerText = "Please fill all fields.";
-            btn.innerText = "Authenticating..."; msg.innerText = "";
-            
-            try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: email, password: pass }) });
-                const result = await res.json();
-                if(result.success) {
-                    localStorage.setItem('rk_user', JSON.stringify({ email: result.email, shipping: result.shipping }));
-                    checkLoginState();
-                    closeAuth();
-                } else { msg.innerText = result.message; msg.style.color = "red"; }
-            } catch(e) { msg.innerText = "Connection error."; }
-            btn.innerText = "Sign In";
-        }
-
-        async function registerUser() {
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            const ship = document.getElementById('reg-ship').value;
-            const msg = document.getElementById('reg-msg');
-            const btn = document.getElementById('btn-reg');
-            
-            if(!email || !pass) return msg.innerText = "Email and Password required.";
-            btn.innerText = "Registering..."; msg.innerText = "";
-            
-            try {
-                const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'register', email: email, password: pass, shipping: ship }) });
-                const result = await res.json();
-                if(result.success) {
-                    localStorage.setItem('rk_user', JSON.stringify({ email: result.email, shipping: result.shipping }));
-                    checkLoginState();
-                    closeAuth();
-                    alert("Account created successfully!");
-                } else { msg.innerText = result.message; msg.style.color = "red"; }
-            } catch(e) { msg.innerText = "Connection error."; }
-            btn.innerText = "Register";
-        }
-
-        // --- RENDER CATALOG ---
-        function renderCatalog() {
-            const grid = document.getElementById('product-grid');
-            document.getElementById('loading-msg').style.display = 'none';
-            grid.innerHTML = '';
-
-            catalogData.forEach(item => {
-                const price = Number(item["Resale Price"]).toFixed(2);
-                const imgUrl = item["Image 1 URL"] ? item["Image 1 URL"] : "https://via.placeholder.com/300x250?text=Roman+Keno";
-                
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.onclick = (e) => {
-                    if(e.target.tagName !== 'BUTTON') {
-                        openPdp(item["SKU / Set ID"]);
-                    }
-                };
-                card.innerHTML = `
-                    <img src="${imgUrl}" alt="${item["Product Name"]}" class="product-img">
-                    <div class="product-info">
-                        <h4 class="product-title">${item["Product Name"]}</h4>
-                        <p class="product-price">£${price}</p>
-                        <button class="add-to-cart" onclick="addToCart('${item["SKU / Set ID"]}', '${item["Product Name"].replace(/'/g, "\\'")}', ${price})">Add to Order</button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // --- CART LOGIC ---
-        function addToCart(sku, name, price) {
-            addToCartWithOptions(sku, name, price, 1);
-        }
-
-        function addToCartWithOptions(sku, name, price, qty) {
-            const existingItem = cart.find(i => i.sku === sku);
-            if (existingItem) { existingItem.qty += qty; } 
-            else { cart.push({ sku, name, price, qty: qty }); }
-            updateCartUI(); openCart();
-        }
-
-        function updateCartUI() {
-            document.getElementById('cart-count').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
-            const container = document.getElementById('cart-items-container');
-            let total = 0;
-            
-            if (cart.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#888;">Your cart is empty.</p>';
-            } else {
-                container.innerHTML = '';
-                cart.forEach((item, index) => {
-                    const itemTotal = item.price * item.qty;
-                    total += itemTotal;
-                    container.innerHTML += `
-                        <div class="cart-item">
-                            <div><strong>${item.name}</strong><br><small>Qty: ${item.qty} | SKU: ${item.sku}</small></div>
-                            <div>£${itemTotal.toFixed(2)}<br><small><a href="#" onclick="removeItem(${index})" style="color:red;">Remove</a></small></div>
-                        </div>
-                    `;
-                });
-            }
-            document.getElementById('cart-total').innerText = total.toFixed(2);
-        }
-
-        function removeItem(index) { cart.splice(index, 1); updateCartUI(); }
-        function openCart() { document.getElementById('cart-modal').style.display = 'flex'; }
-        function closeCart() { document.getElementById('cart-modal').style.display = 'none'; }
-
-        // --- CHECKOUT LOGIC ---
-        async function processMockCheckout() {
-            if (cart.length === 0) return alert("Cart is empty!");
-            
-            const email = document.getElementById('chk-email').value;
-            const shipping = document.getElementById('chk-shipping').value;
-            const total = document.getElementById('cart-total').innerText;
-            const btn = document.getElementById('btn-checkout');
-            const msg = document.getElementById('checkout-msg');
-
-            if (!email || !shipping) return alert("Please enter email and shipping details.");
-
-            btn.innerText = "Processing Securely..."; btn.disabled = true;
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'checkout', email: email, shipping: shipping, total: total, cart: cart })
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    msg.style.color = "green"; msg.innerText = `Success! Order ID: ${result.orderId}`;
-                    cart = []; updateCartUI();
-                    setTimeout(() => { closeCart(); msg.innerText = ""; btn.innerText = "Pay with Tide / Card"; btn.disabled = false; }, 3000);
-                } else throw new Error(result.message);
-            } catch (err) {
-                msg.style.color = "red"; msg.innerText = "Error: " + err.message;
-                btn.innerText = "Try Again"; btn.disabled = false;
-            }
-        }
-    </script>
+    window.onload = loadStoreData;
+  </script>
 </body>
 </html>
