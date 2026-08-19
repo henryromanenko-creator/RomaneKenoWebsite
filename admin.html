@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roman Keno Admin</title>
+  <style>
+    :root {
+      --charcoal: #1a1a1a;
+      --burgundy: #5c001e;
+      --gold: #c5a059;
+      --gold-light: #e2c28b;
+      --cream: #f5f1e8;
+      --error: #b00020;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background: var(--charcoal);
+      color: var(--cream);
+      min-height: 100vh;
+      display: flex;
+    }
+    .sidebar {
+      width: 240px;
+      background: var(--burgundy);
+      padding: 2rem 1rem;
+      position: fixed;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .sidebar h1 {
+      font-size: 1.6rem;
+      color: var(--gold);
+      margin-bottom: 2rem;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+    .sidebar button {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 0.8rem 1rem;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+    .sidebar button:hover, .sidebar button.active {
+      background: var(--gold);
+      color: var(--charcoal);
+    }
+    .main {
+      margin-left: 240px;
+      padding: 2rem;
+      flex: 1;
+    }
+    .module {
+      display: none;
+    }
+    .module.active { display: block; }
+    h2 {
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      font-weight: normal;
+      letter-spacing: 1px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      background: #222;
+    }
+    th, td {
+      padding: 0.7rem;
+      text-align: left;
+      border-bottom: 1px solid #333;
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--burgundy);
+      color: var(--gold);
+    }
+    input[type="text"], input[type="number"], input[type="password"], textarea, select {
+      width: 100%;
+      padding: 0.6rem;
+      background: #2a2a2a;
+      color: var(--cream);
+      border: 1px solid #444;
+      margin-bottom: 0.8rem;
+    }
+    button {
+      background: var(--gold);
+      color: var(--charcoal);
+      border: none;
+      padding: 0.7rem 1.2rem;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: opacity 0.3s;
+    }
+    button:hover { opacity: 0.8; }
+    .btn-danger { background: var(--error); color: white; }
+    .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .card { background: #222; padding: 1.5rem; border: 1px solid #333; }
+    .gallery { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .gallery img { width: 150px; height: 150px; object-fit: cover; border: 2px solid var(--gold); }
+    .message { padding: 1rem; margin: 1rem 0; background: #2a2a2a; border-left: 4px solid var(--gold); }
+    .login-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: var(--charcoal);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .login-box {
+      background: var(--burgundy);
+      padding: 2rem;
+      border: 1px solid var(--gold);
+      width: 350px;
+      text-align: center;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      background: #2a2a2a;
+      color: var(--cream);
+      border: 1px solid #444;
+    }
+    .login-box button {
+      background: var(--gold);
+      color: var(--charcoal);
+      padding: 0.8rem 1.5rem;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="login-overlay" class="login-overlay">
+    <div class="login-box">
+      <h2 style="color: var(--gold);">Roman Keno Admin</h2>
+      <input type="password" id="admin-key-input" placeholder="Admin Key">
+      <button onclick="loginAdmin()">Login</button>
+      <p id="login-error" style="color: red; margin-top: 1rem;"></p>
+    </div>
+  </div>
+
+  <div class="sidebar" id="sidebar" style="display:none;">
+    <h1>ROMAN KENO</h1>
+    <button data-module="stock" class="active">📦 Stock Management</button>
+    <button data-module="sets">🧩 Sets & Bundles</button>
+    <button data-module="listings">🛍️ Website Listings</button>
+    <button data-module="lookbook">📸 Artisan Lookbook</button>
+    <button data-module="orders">📋 Orders & Customers</button>
+    <button data-module="content">✏️ Content Editor</button>
+  </div>
+
+  <div class="main" id="main" style="display:none;">
+    <!-- STOCK MODULE -->
+    <div id="module-stock" class="module active">
+      <h2>Stock Management</h2>
+      <div class="card">
+        <h3>Add Stock Item</h3>
+        <div class="grid-2">
+          <input type="text" id="stock-sku" placeholder="SKU / Item Code">
+          <input type="text" id="stock-name" placeholder="Product Name">
+          <input type="number" id="stock-qty" placeholder="Quantity Available">
+          <input type="number" id="stock-cost" placeholder="Unit Cost Price" step="0.01">
+          <input type="number" id="stock-price" placeholder="Resell Price" step="0.01">
+          <input type="text" id="stock-vat" placeholder="VAT Rate" value="20%">
+        </div>
+        <button onclick="addStock()">Add Stock</button>
+      </div>
+      <button class="btn-danger" onclick="bulkDeleteStock()" style="margin:1rem 0;">Delete Selected Stock Items</button>
+      <table id="stock-table">
+        <thead><tr><th><input type="checkbox" id="select-all-stock" onchange="toggleAllStock()"></th><th>SKU</th><th>Product Name</th><th>Qty</th><th>Cost</th><th>Price</th><th>VAT</th><th>Total Value</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- SETS MODULE -->
+    <div id="module-sets" class="module">
+      <h2>Sets & Bundles</h2>
+      <div class="card">
+        <h3>Create / Edit Set</h3>
+        <input type="text" id="set-id" placeholder="Set ID (auto if blank)">
+        <input type="text" id="set-title" placeholder="Set Title">
+        <textarea id="set-description" rows="3" placeholder="Description"></textarea>
+        <textarea id="set-components" rows="4" placeholder='Components JSON e.g. [{"sku":"KK-S348-092","qty":2,"cost":0.5}]'></textarea>
+        <input type="number" id="set-total-cost" placeholder="Total Cost" step="0.01">
+        <input type="number" id="set-resell-price" placeholder="Resell Price" step="0.01">
+        <input type="file" id="set-image" accept="image/*">
+        <button onclick="uploadSetImageAndSave()">Save Set</button>
+      </div>
+      <table id="sets-table">
+        <thead><tr><th>Set ID</th><th>Title</th><th>Total Cost</th><th>Resell Price</th><th>Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- LISTINGS MODULE -->
+    <div id="module-listings" class="module">
+      <h2>Website Listings Manager</h2>
+      <div class="card">
+        <h3>Add New Listing</h3>
+        <div class="grid-2">
+          <select id="listing-type" onchange="populateSourceDropdown()">
+            <option value="">Select Type</option>
+            <option value="stock">Stock Item</option>
+            <option value="set">Set</option>
+          </select>
+          <select id="listing-source" onchange="prefillListing()">
+            <option value="">Select Source</option>
+          </select>
+        </div>
+        <input type="text" id="listing-title" placeholder="Title (editable)">
+        <textarea id="listing-description" rows="4" placeholder="Enhanced Description"></textarea>
+        <input type="number" id="listing-price" placeholder="Selling Price" step="0.01">
+        <input type="text" id="listing-images" placeholder="Image URLs (comma separated)">
+        <input type="text" id="listing-item-code" placeholder="Item Code" readonly>
+        <input type="text" id="listing-purchase-cost" placeholder="Purchase Cost" readonly>
+        <button onclick="saveStagingListing()">Save to Staging</button>
+      </div>
+      <h3>Staging Area</h3>
+      <table id="staging-table">
+        <thead><tr><th>Listing ID</th><th>Type</th><th>Title</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h3>Live Website Catalog</h3>
+      <table id="live-table">
+        <thead><tr><th>Listing ID</th><th>Type</th><th>Title</th><th>Price</th><th>Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- LOOKBOOK MODULE -->
+    <div id="module-lookbook" class="module">
+      <h2>Artisan Jewelry Lookbook</h2>
+      <div class="card">
+        <input type="file" id="lookbook-files" multiple accept="image/*">
+        <button onclick="uploadLookbookImages()">Upload to GitHub</button>
+      </div>
+      <h3>Current Lookbook Images</h3>
+      <div id="lookbook-gallery" class="gallery"></div>
+    </div>
+
+    <!-- ORDERS MODULE -->
+    <div id="module-orders" class="module">
+      <h2>Order & Customer Management</h2>
+      <h3>Orders</h3>
+      <table id="orders-table">
+        <thead><tr><th>Order ID</th><th>Customer</th><th>Email</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <h3>Customers</h3>
+      <table id="customers-table">
+        <thead><tr><th>Customer ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Created</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- CONTENT MODULE -->
+    <div id="module-content" class="module">
+      <h2>Content Editor</h2>
+      <textarea id="about-text" rows="10" style="width:100%;"></textarea>
+      <button onclick="saveAbout()">Save About Us</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbxhgv0JegP44GZc3yqZH3TF0Q_W8kahe3TwKqXKZeF-by8JUAY-hxVsJYxuy4vu-vci5A/exec';
+    let adminKey = sessionStorage.getItem('adminKey') || '';
+    let stockData = [];
+    let setsData = [];
+    let listingSources = { stock: [], sets: [] };
+
+    // Check if admin key exists
+    if (adminKey) {
+      checkAdminKey();
+    }
+
+    function loginAdmin() {
+      const key = document.getElementById('admin-key-input').value.trim();
+      if (!key) return showLoginError('Please enter a key');
+      adminKey = key;
+      checkAdminKey();
+    }
+
+    function checkAdminKey() {
+      apiCall('test', { adminKey })
+        .then(() => {
+          sessionStorage.setItem('adminKey', adminKey);
+          document.getElementById('login-overlay').style.display = 'none';
+          document.getElementById('sidebar').style.display = 'flex';
+          document.getElementById('main').style.display = 'block';
+          loadAll();
+        })
+        .catch(err => {
+          showLoginError('Invalid admin key: ' + err.message);
+        });
+    }
+
+    function showLoginError(msg) {
+      document.getElementById('login-error').textContent = msg;
+    }
+
+    function showMessage(msg) {
+      const div = document.createElement('div');
+      div.className = 'message';
+      div.textContent = msg;
+      document.querySelector('.main').prepend(div);
+      setTimeout(() => div.remove(), 3000);
+    }
+
+    // API helper with admin key
+    async function apiCall(action, params = {}) {
+      const url = new URL(API_BASE);
+      url.searchParams.append('action', action);
+      url.searchParams.append('adminKey', adminKey);
+      Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.append(key, value);
+      });
+      const response = await fetch(url, { cache: 'no-store' });
+      const data = await response.json();
+      if (data && data.success === false) {
+        throw new Error(data.error || 'API error');
+      }
+      return data;
+    }
+
+    // Tab switching
+    document.querySelectorAll('.sidebar button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+        document.getElementById('module-' + btn.dataset.module).classList.add('active');
+      });
+    });
+
+    function loadAll() {
+      loadStock();
+      loadSets();
+      loadListingSources();
+      loadStagingAndLive();
+      loadLookbook();
+      loadOrdersAndCustomers();
+      loadAbout();
+    }
+
+    // STOCK
+    async function loadStock() {
+      try {
+        stockData = await apiCall('getStock');
+        renderStockTable();
+      } catch (err) {
+        showMessage('Error loading stock: ' + err.message);
+      }
+    }
+
+    function renderStockTable() {
+      const tbody = document.querySelector('#stock-table tbody');
+      tbody.innerHTML = stockData.map(item => `
+        <tr>
+          <td><input type="checkbox" class="stock-checkbox" data-sku="${item['SKU / Item Code']}"></td>
+          <td>${item['SKU / Item Code']}</td>
+          <td>${item['Product Name']}</td>
+          <td>${item['Total Single Items Available']}</td>
+          <td>${item['Unit Cost Price']}</td>
+          <td>${item['Resell Price']}</td>
+          <td>${item['VAT Rate']}</td>
+          <td>${item['Total Stock Value']}</td>
+        </tr>
+      `).join('');
+    }
+
+    function toggleAllStock() {
+      const checked = document.getElementById('select-all-stock').checked;
+      document.querySelectorAll('.stock-checkbox').forEach(cb => cb.checked = checked);
+    }
+
+    async function bulkDeleteStock() {
+      const selected = [...document.querySelectorAll('.stock-checkbox:checked')].map(cb => cb.dataset.sku);
+      if (selected.length === 0) return showMessage('No items selected');
+      if (!confirm(`Delete ${selected.length} stock items?`)) return;
+      try {
+        await apiCall('deleteStockItems', { skus: JSON.stringify(selected) });
+        showMessage('Deleted successfully');
+        loadStock();
+      } catch (err) {
+        showMessage('Delete failed: ' + err.message);
+      }
+    }
+
+    async function addStock() {
+      const data = {
+        sku: document.getElementById('stock-sku').value,
+        name: document.getElementById('stock-name').value,
+        qty: document.getElementById('stock-qty').value,
+        cost: document.getElementById('stock-cost').value,
+        price: document.getElementById('stock-price').value,
+        vat: document.getElementById('stock-vat').value
+      };
+      try {
+        await apiCall('addStockItem', { data: JSON.stringify(data) });
+        showMessage('Stock added');
+        loadStock();
+        document.getElementById('stock-sku').value = '';
+        document.getElementById('stock-name').value = '';
+        document.getElementById('stock-qty').value = '';
+        document.getElementById('stock-cost').value = '';
+        document.getElementById('stock-price').value = '';
+      } catch (err) {
+        showMessage('Add failed: ' + err.message);
+      }
+    }
+
+    // SETS
+    async function loadSets() {
+      try {
+        setsData = await apiCall('getSets');
+        renderSetsTable();
+      } catch (err) {
+        showMessage('Error loading sets: ' + err.message);
+      }
+    }
+
+    function renderSetsTable() {
+      const tbody = document.querySelector('#sets-table tbody');
+      tbody.innerHTML = setsData.map(set => `
+        <tr>
+          <td>${set['Set ID']}</td>
+          <td>${set['Title']}</td>
+          <td>${set['Total Cost']}</td>
+          <td>${set['Resell Price']}</td>
+          <td><button onclick="deleteSet('${set['Set ID']}')">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function deleteSet(id) {
+      try {
+        await apiCall('deleteSets', { setIds: JSON.stringify([id]) });
+        showMessage('Set deleted');
+        loadSets();
+      } catch (err) {
+        showMessage('Delete failed: ' + err.message);
+      }
+    }
+
+    function uploadSetImageAndSave() {
+      const fileInput = document.getElementById('set-image');
+      const file = fileInput.files[0];
+      if (!file) return saveSetData(null);
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = reader.result;
+        try {
+          const result = await apiCall('uploadSetImage', { dataUrl, fileName: `set_${Date.now()}_${file.name}` });
+          saveSetData(result.url);
+        } catch (err) {
+          showMessage('Image upload failed: ' + err.message);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveSetData(imageUrl) {
+      const data = {
+        setId: document.getElementById('set-id').value,
+        title: document.getElementById('set-title').value,
+        description: document.getElementById('set-description').value,
+        components: document.getElementById('set-components').value,
+        totalCost: document.getElementById('set-total-cost').value,
+        resellPrice: document.getElementById('set-resell-price').value,
+        imageUrl: imageUrl || ''
+      };
+      try {
+        await apiCall('saveSet', { data: JSON.stringify(data) });
+        showMessage('Set saved');
+        loadSets();
+        loadListingSources();
+      } catch (err) {
+        showMessage('Save failed: ' + err.message);
+      }
+    }
+
+    // LISTINGS
+    async function loadListingSources() {
+      try {
+        listingSources = await apiCall('getListingSources');
+        populateSourceDropdown();
+      } catch (err) {
+        showMessage('Error loading sources: ' + err.message);
+      }
+    }
+
+    function populateSourceDropdown() {
+      const type = document.getElementById('listing-type').value;
+      const sourceSelect = document.getElementById('listing-source');
+      sourceSelect.innerHTML = '<option value="">Select Source</option>';
+      const items = type === 'stock' ? listingSources.stock : type === 'set' ? listingSources.sets : [];
+      items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.sourceId;
+        opt.textContent = `${item.sourceId} - ${item.title}`;
+        opt.dataset.item = JSON.stringify(item);
+        sourceSelect.appendChild(opt);
+      });
+    }
+
+    function prefillListing() {
+      const select = document.getElementById('listing-source');
+      const selected = select.options[select.selectedIndex];
+      if (selected.dataset.item) {
+        const item = JSON.parse(selected.dataset.item);
+        document.getElementById('listing-title').value = item.title || '';
+        document.getElementById('listing-description').value = item.description || '';
+        document.getElementById('listing-price').value = item.sellingPrice || '';
+        document.getElementById('listing-images').value = item.imageUrls || '';
+        document.getElementById('listing-item-code').value = item.itemCode || '';
+        document.getElementById('listing-purchase-cost').value = item.purchaseCost || '';
+      }
+    }
+
+    async function saveStagingListing() {
+      const data = {
+        type: document.getElementById('listing-type').value,
+        sourceId: document.getElementById('listing-source').value,
+        title: document.getElementById('listing-title').value,
+        description: document.getElementById('listing-description').value,
+        sellingPrice: document.getElementById('listing-price').value,
+        imageUrls: document.getElementById('listing-images').value,
+        itemCode: document.getElementById('listing-item-code').value,
+        purchaseCost: document.getElementById('listing-purchase-cost').value
+      };
+      try {
+        await apiCall('saveStagingListing', { data: JSON.stringify(data) });
+        showMessage('Listing saved to staging');
+        loadStagingAndLive();
+      } catch (err) {
+        showMessage('Save failed: ' + err.message);
+      }
+    }
+
+    async function loadStagingAndLive() {
+      try {
+        const staging = await apiCall('getStagingListings');
+        renderStagingTable(staging);
+        const live = await apiCall('getLiveListingsAdmin');
+        renderLiveTable(live);
+      } catch (err) {
+        showMessage('Error loading listings: ' + err.message);
+      }
+    }
+
+    function renderStagingTable(staging) {
+      const tbody = document.querySelector('#staging-table tbody');
+      tbody.innerHTML = staging.map(l => `
+        <tr>
+          <td>${l['Listing ID']}</td>
+          <td>${l['Type']}</td>
+          <td>${l['Title']}</td>
+          <td>${l['Selling Price']}</td>
+          <td>${l['Status']}</td>
+          <td>
+            <button onclick="publishListing('${l['Listing ID']}')">Publish</button>
+            <button class="btn-danger" onclick="deleteStaging('${l['Listing ID']}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderLiveTable(live) {
+      const tbody = document.querySelector('#live-table tbody');
+      tbody.innerHTML = live.map(l => `
+        <tr>
+          <td>${l['Listing ID']}</td>
+          <td>${l['Type']}</td>
+          <td>${l['Title']}</td>
+          <td>${l['Selling Price']}</td>
+          <td><button class="btn-danger" onclick="deleteLive('${l['Listing ID']}')">Remove</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function publishListing(id) {
+      try {
+        await apiCall('publishListing', { listingId: id });
+        showMessage('Published');
+        loadStagingAndLive();
+        loadListingSources();
+      } catch (err) {
+        showMessage('Publish failed: ' + err.message);
+      }
+    }
+
+    async function deleteStaging(id) {
+      try {
+        await apiCall('deleteStagingListing', { listingId: id });
+        showMessage('Deleted');
+        loadStagingAndLive();
+      } catch (err) {
+        showMessage('Delete failed: ' + err.message);
+      }
+    }
+
+    async function deleteLive(id) {
+      try {
+        await apiCall('deleteLiveListing', { listingId: id });
+        showMessage('Removed from live');
+        loadStagingAndLive();
+      } catch (err) {
+        showMessage('Delete failed: ' + err.message);
+      }
+    }
+
+    // LOOKBOOK
+    async function loadLookbook() {
+      try {
+        const images = await apiCall('getLookbookImagesAdmin');
+        const gallery = document.getElementById('lookbook-gallery');
+        gallery.innerHTML = images.map(img => `<img src="${img['Content URL/Text']}" alt="Lookbook">`).join('');
+      } catch (err) {
+        showMessage('Error loading lookbook: ' + err.message);
+      }
+    }
+
+    async function uploadLookbookImages() {
+      const files = document.getElementById('lookbook-files').files;
+      if (files.length === 0) return showMessage('No files selected');
+      for (const file of files) {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            await apiCall('uploadLookbookImage', { dataUrl: reader.result, fileName: `lookbook_${Date.now()}_${file.name}` });
+            showMessage('Uploaded');
+            loadLookbook();
+          } catch (err) {
+            showMessage('Upload failed: ' + err.message);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // ORDERS & CUSTOMERS
+    async function loadOrdersAndCustomers() {
+      try {
+        const orders = await apiCall('getOrders');
+        const tbody = document.querySelector('#orders-table tbody');
+        tbody.innerHTML = orders.map(o => `
+          <tr>
+            <td>${o['Order ID']}</td>
+            <td>${o['Customer Name']}</td>
+            <td>${o['Email']}</td>
+            <td>${o['Total']}</td>
+            <td>${o['Status']}</td>
+            <td>${o['Status'] !== 'Processed' ? `<button onclick="processOrder('${o['Order ID']}')">Mark Processed</button>` : 'Done'}</td>
+          </tr>
+        `).join('');
+        const customers = await apiCall('getCustomers');
+        const ctbody = document.querySelector('#customers-table tbody');
+        ctbody.innerHTML = customers.map(c => `
+          <tr>
+            <td>${c['Customer ID']}</td>
+            <td>${c['Name']}</td>
+            <td>${c['Email']}</td>
+            <td>${c['Phone']}</td>
+            <td>${c['Created At']}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        showMessage('Error loading orders/customers: ' + err.message);
+      }
+    }
+
+    async function processOrder(orderId) {
+      try {
+        await apiCall('updateOrderStatus', { orderId, status: 'Processed' });
+        showMessage('Order processed and stock deducted');
+        loadOrdersAndCustomers();
+        loadStock();
+      } catch (err) {
+        showMessage('Processing failed: ' + err.message);
+      }
+    }
+
+    // CONTENT
+    async function loadAbout() {
+      try {
+        const res = await apiCall('getSiteContentAdmin', { type: 'About_Text' });
+        document.getElementById('about-text').value = res.content || '';
+      } catch (err) {
+        showMessage('Error loading about: ' + err.message);
+      }
+    }
+
+    async function saveAbout() {
+      try {
+        await apiCall('saveSiteContent', { type: 'About_Text', content: document.getElementById('about-text').value });
+        showMessage('Saved');
+      } catch (err) {
+        showMessage('Save failed: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
