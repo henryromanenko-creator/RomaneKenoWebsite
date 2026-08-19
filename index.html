@@ -128,6 +128,13 @@
       line-height: 1.8;
       text-align: center;
     }
+    .error-inline {
+      background: #5c001e;
+      color: #f5f1e8;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-left: 4px solid #c5a059;
+    }
     .contact-form {
       max-width: 500px;
       margin: 0 auto;
@@ -229,21 +236,27 @@
   <section id="supplies">
     <div class="container">
       <h2>Curated Supplies</h2>
-      <div id="product-grid" class="product-grid"></div>
+      <div id="product-grid" class="product-grid">
+        <p>Loading supplies...</p>
+      </div>
     </div>
   </section>
 
   <section id="lookbook">
     <div class="container">
       <h2>Artisan Jewelry — The Lookbook</h2>
-      <div id="lookbook-gallery" class="gallery"></div>
+      <div id="lookbook-gallery" class="gallery">
+        <p>Loading lookbook...</p>
+      </div>
     </div>
   </section>
 
   <section id="about">
     <div class="container">
       <h2>About Roman Keno</h2>
-      <div id="about-text" class="about-text"></div>
+      <div id="about-text" class="about-text">
+        <p>Loading about...</p>
+      </div>
     </div>
   </section>
 
@@ -306,19 +319,28 @@
   </div>
 
   <script>
-    // Replace with your actual Apps Script Web App URL
+    // === CONFIGURATION ===
+    // New deployment URL (as provided)
     const API_BASE = 'https://script.google.com/macros/s/AKfycbxhgv0JegP44GZc3yqZH3TF0Q_W8kahe3TwKqXKZeF-by8JUAY-hxVsJYxuy4vu-vci5A/exec';
 
+    // === API helper ===
     async function apiCall(action, params = {}) {
       const url = new URL(API_BASE);
       url.searchParams.append('action', action);
       Object.entries(params).forEach(([key, value]) => {
         url.searchParams.append(key, value);
       });
-      const response = await fetch(url);
-      return response.json();
+
+      const response = await fetch(url, { cache: 'no-store' });
+      const data = await response.json();
+
+      if (data && data.success === false) {
+        throw new Error(data.error || 'API error');
+      }
+      return data;
     }
 
+    // === Auth modal handlers ===
     function openAuth(type) {
       document.getElementById(type + '-modal').classList.add('active');
     }
@@ -326,12 +348,19 @@
       document.getElementById(type + '-modal').classList.remove('active');
     }
 
-    async function loadStoreData() {
+    // === Load supplies ===
+    async function loadSupplies() {
+      const container = document.getElementById('product-grid');
       try {
-        // Load live listings
         const listings = await apiCall('getLiveListings');
-        const grid = document.getElementById('product-grid');
-        grid.innerHTML = listings.map(l => `
+        if (!Array.isArray(listings)) {
+          throw new Error('Invalid data from server');
+        }
+        if (listings.length === 0) {
+          container.innerHTML = '<p>No supplies currently listed. Please check back soon.</p>';
+          return;
+        }
+        container.innerHTML = listings.map(l => `
           <div class="product-card">
             <img src="${(l['Image URLs'] || '').split(',')[0] || 'https://via.placeholder.com/400'}" alt="${l['Title']}">
             <div class="info">
@@ -342,21 +371,44 @@
             </div>
           </div>
         `).join('');
-
-        // Load lookbook
-        const images = await apiCall('getLookbookImages');
-        const gallery = document.getElementById('lookbook-gallery');
-        gallery.innerHTML = images.map(img => `<img src="${img['Content URL/Text']}" alt="Artisan Piece">`).join('');
-
-        // Load about
-        const aboutRes = await apiCall('getSiteContent', { type: 'About_Text' });
-        document.getElementById('about-text').textContent = aboutRes.content;
       } catch (err) {
-        console.error('Error loading store data:', err);
-        alert('Unable to load data. Please try again later.');
+        console.error('Supplies load error:', err);
+        container.innerHTML = `<div class="error-inline">Unable to load supplies: ${err.message}</div>`;
       }
     }
 
+    // === Load lookbook ===
+    async function loadLookbook() {
+      const container = document.getElementById('lookbook-gallery');
+      try {
+        const images = await apiCall('getLookbookImages');
+        if (!Array.isArray(images)) {
+          throw new Error('Invalid data from server');
+        }
+        if (images.length === 0) {
+          container.innerHTML = '<p>No artisan pieces currently displayed.</p>';
+          return;
+        }
+        container.innerHTML = images.map(img => `<img src="${img['Content URL/Text']}" alt="Artisan Piece">`).join('');
+      } catch (err) {
+        console.error('Lookbook load error:', err);
+        container.innerHTML = `<div class="error-inline">Unable to load lookbook: ${err.message}</div>`;
+      }
+    }
+
+    // === Load about text ===
+    async function loadAbout() {
+      const container = document.getElementById('about-text');
+      try {
+        const res = await apiCall('getSiteContent', { type: 'About_Text' });
+        container.textContent = res.content || '';
+      } catch (err) {
+        console.error('About load error:', err);
+        container.innerHTML = `<div class="error-inline">Unable to load about text: ${err.message}</div>`;
+      }
+    }
+
+    // === Cart (simple) ===
     function addToCart(id, title, price) {
       let cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
       cart.push({ listingId: id, title, price, qty: 1 });
@@ -364,6 +416,7 @@
       alert(`Added "${title}" to cart.`);
     }
 
+    // === Registration ===
     async function register() {
       const data = {
         name: document.getElementById('reg-name').value,
@@ -385,6 +438,7 @@
       }
     }
 
+    // === Login ===
     async function login() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
@@ -402,12 +456,18 @@
       }
     }
 
+    // === Contact (placeholder) ===
     function sendContact() {
       alert('Thank you for your message. We will respond within 24 hours.');
       document.querySelector('.contact-form').reset();
     }
 
-    window.onload = loadStoreData;
+    // === Initialise ===
+    window.onload = function() {
+      loadSupplies();
+      loadLookbook();
+      loadAbout();
+    };
   </script>
 </body>
 </html>
