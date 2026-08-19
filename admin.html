@@ -57,9 +57,7 @@
       padding: 2rem;
       flex: 1;
     }
-    .module {
-      display: none;
-    }
+    .module { display: none; }
     .module.active { display: block; }
     h2 {
       color: var(--gold);
@@ -283,10 +281,7 @@
     let setsData = [];
     let listingSources = { stock: [], sets: [] };
 
-    // Check if admin key exists
-    if (adminKey) {
-      checkAdminKey();
-    }
+    if (adminKey) checkAdminKey();
 
     function loginAdmin() {
       const key = document.getElementById('admin-key-input').value.trim();
@@ -304,9 +299,7 @@
           document.getElementById('main').style.display = 'block';
           loadAll();
         })
-        .catch(err => {
-          showLoginError('Invalid admin key: ' + err.message);
-        });
+        .catch(err => showLoginError('Invalid admin key: ' + err.message));
     }
 
     function showLoginError(msg) {
@@ -321,7 +314,6 @@
       setTimeout(() => div.remove(), 3000);
     }
 
-    // API helper with admin key
     async function apiCall(action, params = {}) {
       const url = new URL(API_BASE);
       url.searchParams.append('action', action);
@@ -331,13 +323,10 @@
       });
       const response = await fetch(url, { cache: 'no-store' });
       const data = await response.json();
-      if (data && data.success === false) {
-        throw new Error(data.error || 'API error');
-      }
+      if (data && data.success === false) throw new Error(data.error || 'API error');
       return data;
     }
 
-    // Tab switching
     document.querySelectorAll('.sidebar button').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
@@ -362,9 +351,7 @@
       try {
         stockData = await apiCall('getStock');
         renderStockTable();
-      } catch (err) {
-        showMessage('Error loading stock: ' + err.message);
-      }
+      } catch (err) { showMessage('Error loading stock: ' + err.message); }
     }
 
     function renderStockTable() {
@@ -396,9 +383,7 @@
         await apiCall('deleteStockItems', { skus: JSON.stringify(selected) });
         showMessage('Deleted successfully');
         loadStock();
-      } catch (err) {
-        showMessage('Delete failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Delete failed: ' + err.message); }
     }
 
     async function addStock() {
@@ -419,9 +404,7 @@
         document.getElementById('stock-qty').value = '';
         document.getElementById('stock-cost').value = '';
         document.getElementById('stock-price').value = '';
-      } catch (err) {
-        showMessage('Add failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Add failed: ' + err.message); }
     }
 
     // SETS
@@ -429,9 +412,7 @@
       try {
         setsData = await apiCall('getSets');
         renderSetsTable();
-      } catch (err) {
-        showMessage('Error loading sets: ' + err.message);
-      }
+      } catch (err) { showMessage('Error loading sets: ' + err.message); }
     }
 
     function renderSetsTable() {
@@ -452,9 +433,7 @@
         await apiCall('deleteSets', { setIds: JSON.stringify([id]) });
         showMessage('Set deleted');
         loadSets();
-      } catch (err) {
-        showMessage('Delete failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Delete failed: ' + err.message); }
     }
 
     function uploadSetImageAndSave() {
@@ -467,9 +446,7 @@
         try {
           const result = await apiCall('uploadSetImage', { dataUrl, fileName: `set_${Date.now()}_${file.name}` });
           saveSetData(result.url);
-        } catch (err) {
-          showMessage('Image upload failed: ' + err.message);
-        }
+        } catch (err) { showMessage('Image upload failed: ' + err.message); }
       };
       reader.readAsDataURL(file);
     }
@@ -489,9 +466,7 @@
         showMessage('Set saved');
         loadSets();
         loadListingSources();
-      } catch (err) {
-        showMessage('Save failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Save failed: ' + err.message); }
     }
 
     // LISTINGS
@@ -499,9 +474,7 @@
       try {
         listingSources = await apiCall('getListingSources');
         populateSourceDropdown();
-      } catch (err) {
-        showMessage('Error loading sources: ' + err.message);
-      }
+      } catch (err) { showMessage('Error loading sources: ' + err.message); }
     }
 
     function populateSourceDropdown() {
@@ -547,9 +520,7 @@
         await apiCall('saveStagingListing', { data: JSON.stringify(data) });
         showMessage('Listing saved to staging');
         loadStagingAndLive();
-      } catch (err) {
-        showMessage('Save failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Save failed: ' + err.message); }
     }
 
     async function loadStagingAndLive() {
@@ -558,9 +529,7 @@
         renderStagingTable(staging);
         const live = await apiCall('getLiveListingsAdmin');
         renderLiveTable(live);
-      } catch (err) {
-        showMessage('Error loading listings: ' + err.message);
-      }
+      } catch (err) { showMessage('Error loading listings: ' + err.message); }
     }
 
     function renderStagingTable(staging) {
@@ -599,9 +568,7 @@
         showMessage('Published');
         loadStagingAndLive();
         loadListingSources();
-      } catch (err) {
-        showMessage('Publish failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Publish failed: ' + err.message); }
     }
 
     async function deleteStaging(id) {
@@ -609,9 +576,7 @@
         await apiCall('deleteStagingListing', { listingId: id });
         showMessage('Deleted');
         loadStagingAndLive();
-      } catch (err) {
-        showMessage('Delete failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Delete failed: ' + err.message); }
     }
 
     async function deleteLive(id) {
@@ -619,9 +584,7 @@
         await apiCall('deleteLiveListing', { listingId: id });
         showMessage('Removed from live');
         loadStagingAndLive();
-      } catch (err) {
-        showMessage('Delete failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Delete failed: ' + err.message); }
     }
 
     // LOOKBOOK
@@ -630,9 +593,7 @@
         const images = await apiCall('getLookbookImagesAdmin');
         const gallery = document.getElementById('lookbook-gallery');
         gallery.innerHTML = images.map(img => `<img src="${img['Content URL/Text']}" alt="Lookbook">`).join('');
-      } catch (err) {
-        showMessage('Error loading lookbook: ' + err.message);
-      }
+      } catch (err) { showMessage('Error loading lookbook: ' + err.message); }
     }
 
     async function uploadLookbookImages() {
@@ -645,9 +606,7 @@
             await apiCall('uploadLookbookImage', { dataUrl: reader.result, fileName: `lookbook_${Date.now()}_${file.name}` });
             showMessage('Uploaded');
             loadLookbook();
-          } catch (err) {
-            showMessage('Upload failed: ' + err.message);
-          }
+          } catch (err) { showMessage('Upload failed: ' + err.message); }
         };
         reader.readAsDataURL(file);
       }
@@ -679,9 +638,7 @@
             <td>${c['Created At']}</td>
           </tr>
         `).join('');
-      } catch (err) {
-        showMessage('Error loading orders/customers: ' + err.message);
-      }
+      } catch (err) { showMessage('Error loading orders/customers: ' + err.message); }
     }
 
     async function processOrder(orderId) {
@@ -690,9 +647,7 @@
         showMessage('Order processed and stock deducted');
         loadOrdersAndCustomers();
         loadStock();
-      } catch (err) {
-        showMessage('Processing failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Processing failed: ' + err.message); }
     }
 
     // CONTENT
@@ -700,18 +655,14 @@
       try {
         const res = await apiCall('getSiteContentAdmin', { type: 'About_Text' });
         document.getElementById('about-text').value = res.content || '';
-      } catch (err) {
-        showMessage('Error loading about: ' + err.message);
-      }
+      } catch (err) { showMessage('Error loading about: ' + err.message); }
     }
 
     async function saveAbout() {
       try {
         await apiCall('saveSiteContent', { type: 'About_Text', content: document.getElementById('about-text').value });
         showMessage('Saved');
-      } catch (err) {
-        showMessage('Save failed: ' + err.message);
-      }
+      } catch (err) { showMessage('Save failed: ' + err.message); }
     }
   </script>
 </body>
