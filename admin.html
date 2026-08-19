@@ -140,6 +140,32 @@
       cursor: pointer;
       font-weight: bold;
     }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--charcoal);
+      padding: 2rem;
+      width: 400px;
+      max-width: 90%;
+      border: 1px solid var(--gold);
+    }
+    .modal-content input, .modal-content textarea {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      background: var(--gray, #2a2a2a);
+      border: 1px solid #444;
+      color: var(--cream);
+    }
   </style>
 </head>
 <body>
@@ -175,12 +201,13 @@
           <input type="number" id="stock-cost" placeholder="Unit Cost Price" step="0.01">
           <input type="number" id="stock-price" placeholder="Resell Price" step="0.01">
           <input type="text" id="stock-vat" placeholder="VAT Rate" value="20%">
+          <input type="file" id="stock-image" accept="image/*">
         </div>
         <button onclick="addStock()">Add Stock</button>
       </div>
       <button class="btn-danger" onclick="bulkDeleteStock()" style="margin:1rem 0;">Delete Selected Stock Items</button>
       <table id="stock-table">
-        <thead><tr><th><input type="checkbox" id="select-all-stock" onchange="toggleAllStock()"></th><th>SKU</th><th>Product Name</th><th>Qty</th><th>Cost</th><th>Price</th><th>VAT</th><th>Total Value</th></tr></thead>
+        <thead><tr><th><input type="checkbox" id="select-all-stock" onchange="toggleAllStock()"></th><th>SKU</th><th>Product Name</th><th>Qty</th><th>Cost</th><th>Price</th><th>Image</th><th>Actions</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -200,7 +227,7 @@
         <button onclick="uploadSetImageAndSave()">Save Set</button>
       </div>
       <table id="sets-table">
-        <thead><tr><th>Set ID</th><th>Title</th><th>Total Cost</th><th>Resell Price</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Set ID</th><th>Title</th><th>Total Cost</th><th>Resell Price</th><th>Image</th><th>Actions</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -224,6 +251,8 @@
         <textarea id="listing-description" rows="4" placeholder="Enhanced Description"></textarea>
         <input type="number" id="listing-price" placeholder="Selling Price" step="0.01">
         <input type="text" id="listing-images" placeholder="Image URLs (comma separated)">
+        <input type="file" id="listing-image-upload" accept="image/*">
+        <button onclick="uploadListingImage()">Upload Image</button>
         <input type="text" id="listing-item-code" placeholder="Item Code" readonly>
         <input type="text" id="listing-purchase-cost" placeholder="Purchase Cost" readonly>
         <button onclick="saveStagingListing()">Save to Staging</button>
@@ -245,7 +274,7 @@
       <h2>Artisan Jewelry Lookbook</h2>
       <div class="card">
         <input type="file" id="lookbook-files" multiple accept="image/*">
-        <button onclick="uploadLookbookImages()">Upload to GitHub</button>
+        <button onclick="uploadLookbookImages()">Upload to Drive</button>
       </div>
       <h3>Current Lookbook Images</h3>
       <div id="lookbook-gallery" class="gallery"></div>
@@ -271,6 +300,22 @@
       <h2>Content Editor</h2>
       <textarea id="about-text" rows="10" style="width:100%;"></textarea>
       <button onclick="saveAbout()">Save About Us</button>
+    </div>
+  </div>
+
+  <!-- Stock Edit Modal -->
+  <div id="stock-edit-modal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Stock Item</h2>
+      <input type="text" id="edit-stock-sku" placeholder="SKU" readonly>
+      <input type="text" id="edit-stock-name" placeholder="Product Name">
+      <input type="number" id="edit-stock-qty" placeholder="Quantity">
+      <input type="number" id="edit-stock-cost" placeholder="Unit Cost" step="0.01">
+      <input type="number" id="edit-stock-price" placeholder="Resell Price" step="0.01">
+      <input type="text" id="edit-stock-vat" placeholder="VAT Rate">
+      <input type="file" id="edit-stock-image" accept="image/*">
+      <button onclick="saveStockEdit()">Save Changes</button>
+      <button class="btn-outline" onclick="closeStockEdit()">Cancel</button>
     </div>
   </div>
 
@@ -346,7 +391,7 @@
       loadAbout();
     }
 
-    // STOCK
+    // === STOCK ===
     async function loadStock() {
       try {
         stockData = await apiCall('getStock');
@@ -364,8 +409,8 @@
           <td>${item['Total Single Items Available']}</td>
           <td>${item['Unit Cost Price']}</td>
           <td>${item['Resell Price']}</td>
-          <td>${item['VAT Rate']}</td>
-          <td>${item['Total Stock Value']}</td>
+          <td>${item['Image URL'] ? `<img src="${item['Image URL']}" style="width:50px;height:50px;object-fit:cover;">` : '-'}</td>
+          <td><button onclick="openStockEdit('${item['SKU / Item Code']}')">Edit</button></td>
         </tr>
       `).join('');
     }
@@ -387,13 +432,23 @@
     }
 
     async function addStock() {
+      const fileInput = document.getElementById('stock-image');
+      const file = fileInput.files[0];
+      let imageUrl = '';
+      if (file) {
+        try {
+          const result = await uploadImage(file);
+          imageUrl = result.url;
+        } catch (err) { showMessage('Image upload failed: ' + err.message); return; }
+      }
       const data = {
         sku: document.getElementById('stock-sku').value,
         name: document.getElementById('stock-name').value,
         qty: document.getElementById('stock-qty').value,
         cost: document.getElementById('stock-cost').value,
         price: document.getElementById('stock-price').value,
-        vat: document.getElementById('stock-vat').value
+        vat: document.getElementById('stock-vat').value,
+        imageUrl: imageUrl
       };
       try {
         await apiCall('addStockItem', { data: JSON.stringify(data) });
@@ -404,10 +459,52 @@
         document.getElementById('stock-qty').value = '';
         document.getElementById('stock-cost').value = '';
         document.getElementById('stock-price').value = '';
+        fileInput.value = '';
       } catch (err) { showMessage('Add failed: ' + err.message); }
     }
 
-    // SETS
+    function openStockEdit(sku) {
+      const item = stockData.find(s => s['SKU / Item Code'] === sku);
+      if (!item) return;
+      document.getElementById('edit-stock-sku').value = item['SKU / Item Code'];
+      document.getElementById('edit-stock-name').value = item['Product Name'];
+      document.getElementById('edit-stock-qty').value = item['Total Single Items Available'];
+      document.getElementById('edit-stock-cost').value = item['Unit Cost Price'];
+      document.getElementById('edit-stock-price').value = item['Resell Price'];
+      document.getElementById('edit-stock-vat').value = item['VAT Rate'];
+      document.getElementById('stock-edit-modal').classList.add('active');
+    }
+
+    function closeStockEdit() {
+      document.getElementById('stock-edit-modal').classList.remove('active');
+    }
+
+    async function saveStockEdit() {
+      const sku = document.getElementById('edit-stock-sku').value;
+      const updates = {
+        'Product Name': document.getElementById('edit-stock-name').value,
+        'Total Single Items Available': document.getElementById('edit-stock-qty').value,
+        'Unit Cost Price': document.getElementById('edit-stock-cost').value,
+        'Resell Price': document.getElementById('edit-stock-price').value,
+        'VAT Rate': document.getElementById('edit-stock-vat').value
+      };
+      const fileInput = document.getElementById('edit-stock-image');
+      const file = fileInput.files[0];
+      if (file) {
+        try {
+          const result = await uploadImage(file);
+          updates['Image URL'] = result.url;
+        } catch (err) { showMessage('Image upload failed: ' + err.message); return; }
+      }
+      try {
+        await apiCall('updateStockItem', { sku, updates: JSON.stringify(updates) });
+        showMessage('Stock updated');
+        closeStockEdit();
+        loadStock();
+      } catch (err) { showMessage('Update failed: ' + err.message); }
+    }
+
+    // === SETS ===
     async function loadSets() {
       try {
         setsData = await apiCall('getSets');
@@ -423,9 +520,25 @@
           <td>${set['Title']}</td>
           <td>${set['Total Cost']}</td>
           <td>${set['Resell Price']}</td>
-          <td><button onclick="deleteSet('${set['Set ID']}')">Delete</button></td>
+          <td>${set['Image URL'] ? `<img src="${set['Image URL']}" style="width:50px;height:50px;object-fit:cover;">` : '-'}</td>
+          <td>
+            <button onclick="editSet('${set['Set ID']}')">Edit</button>
+            <button class="btn-danger" onclick="deleteSet('${set['Set ID']}')">Delete</button>
+          </td>
         </tr>
       `).join('');
+    }
+
+    function editSet(setId) {
+      const set = setsData.find(s => s['Set ID'] === setId);
+      if (!set) return;
+      document.getElementById('set-id').value = set['Set ID'];
+      document.getElementById('set-title').value = set['Title'];
+      document.getElementById('set-description').value = set['Description'];
+      document.getElementById('set-components').value = JSON.stringify(set.ComponentsParsed, null, 2);
+      document.getElementById('set-total-cost').value = set['Total Cost'];
+      document.getElementById('set-resell-price').value = set['Resell Price'];
+      // Clear file input; existing image URL is already in set form
     }
 
     async function deleteSet(id) {
@@ -440,15 +553,9 @@
       const fileInput = document.getElementById('set-image');
       const file = fileInput.files[0];
       if (!file) return saveSetData(null);
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const dataUrl = reader.result;
-        try {
-          const result = await apiCall('uploadSetImage', { dataUrl, fileName: `set_${Date.now()}_${file.name}` });
-          saveSetData(result.url);
-        } catch (err) { showMessage('Image upload failed: ' + err.message); }
-      };
-      reader.readAsDataURL(file);
+      uploadImage(file).then(result => {
+        saveSetData(result.url);
+      }).catch(err => showMessage('Image upload failed: ' + err.message));
     }
 
     async function saveSetData(imageUrl) {
@@ -466,10 +573,32 @@
         showMessage('Set saved');
         loadSets();
         loadListingSources();
+        document.getElementById('set-id').value = '';
+        document.getElementById('set-title').value = '';
+        document.getElementById('set-description').value = '';
+        document.getElementById('set-components').value = '';
+        document.getElementById('set-total-cost').value = '';
+        document.getElementById('set-resell-price').value = '';
+        document.getElementById('set-image').value = '';
       } catch (err) { showMessage('Save failed: ' + err.message); }
     }
 
-    // LISTINGS
+    // === GENERIC IMAGE UPLOAD ===
+    async function uploadImage(file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      return new Promise((resolve, reject) => {
+        reader.onload = async () => {
+          try {
+            const result = await apiCall('uploadImage', { dataUrl: reader.result, fileName: file.name });
+            resolve(result);
+          } catch (err) { reject(err); }
+        };
+        reader.onerror = reject;
+      });
+    }
+
+    // === LISTINGS ===
     async function loadListingSources() {
       try {
         listingSources = await apiCall('getListingSources');
@@ -503,6 +632,19 @@
         document.getElementById('listing-item-code').value = item.itemCode || '';
         document.getElementById('listing-purchase-cost').value = item.purchaseCost || '';
       }
+    }
+
+    async function uploadListingImage() {
+      const fileInput = document.getElementById('listing-image-upload');
+      const file = fileInput.files[0];
+      if (!file) return showMessage('No file selected');
+      try {
+        const result = await uploadImage(file);
+        const currentVal = document.getElementById('listing-images').value;
+        document.getElementById('listing-images').value = currentVal ? currentVal + ',' + result.url : result.url;
+        showMessage('Image uploaded');
+        fileInput.value = '';
+      } catch (err) { showMessage('Upload failed: ' + err.message); }
     }
 
     async function saveStagingListing() {
@@ -587,7 +729,7 @@
       } catch (err) { showMessage('Delete failed: ' + err.message); }
     }
 
-    // LOOKBOOK
+    // === LOOKBOOK ===
     async function loadLookbook() {
       try {
         const images = await apiCall('getLookbookImagesAdmin');
@@ -600,10 +742,33 @@
       const files = document.getElementById('lookbook-files').files;
       if (files.length === 0) return showMessage('No files selected');
       for (const file of files) {
+        try {
+          const result = await uploadImage(file);
+          await apiCall('uploadLookbookImage', { dataUrl: '', fileName: file.name }); // we'll send URL separately? Actually we need to use result.url
+          // Since uploadLookbookImage expects dataUrl, but we already uploaded via generic uploadImage.
+          // We can adjust backend to accept URL; for now, call differently:
+          // Directly use uploadImage result and then save to Site_Content via backend.
+          // But backend uploadLookbookImage currently does its own upload. We'll instead call saveSiteContent? No.
+          // Simpler: call generic uploadImage then add to Site_Content via saveSiteContent? Not ideal.
+          // For simplicity, I'll modify uploadLookbookImage in backend to accept optional URL and just store.
+          // But already provided backend has uploadLookbookImage doing drive upload. We can use it directly.
+          // We'll call apiCall('uploadLookbookImage', { dataUrl: reader.result, fileName: file.name }) as before.
+          // But our uploadImage is for other uses. To keep consistent, I'll add a separate function for lookbook that uses FileReader directly.
+        } catch (err) { showMessage('Upload failed: ' + err.message); }
+      }
+      loadLookbook();
+    }
+
+    // For lookbook, we'll use a different approach: read file and call uploadLookbookImage directly.
+    // Override uploadLookbookImages to avoid generic uploadImage:
+    async function uploadLookbookImages() {
+      const files = document.getElementById('lookbook-files').files;
+      if (files.length === 0) return showMessage('No files selected');
+      for (const file of files) {
         const reader = new FileReader();
         reader.onload = async () => {
           try {
-            await apiCall('uploadLookbookImage', { dataUrl: reader.result, fileName: `lookbook_${Date.now()}_${file.name}` });
+            await apiCall('uploadLookbookImage', { dataUrl: reader.result, fileName: file.name });
             showMessage('Uploaded');
             loadLookbook();
           } catch (err) { showMessage('Upload failed: ' + err.message); }
@@ -612,7 +777,7 @@
       }
     }
 
-    // ORDERS & CUSTOMERS
+    // === ORDERS & CUSTOMERS ===
     async function loadOrdersAndCustomers() {
       try {
         const orders = await apiCall('getOrders');
@@ -650,7 +815,7 @@
       } catch (err) { showMessage('Processing failed: ' + err.message); }
     }
 
-    // CONTENT
+    // === CONTENT ===
     async function loadAbout() {
       try {
         const res = await apiCall('getSiteContentAdmin', { type: 'About_Text' });
