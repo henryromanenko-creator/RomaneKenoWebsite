@@ -20,7 +20,10 @@
       color: var(--cream);
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
     }
+
+    /* ===== Sidebar (desktop) ===== */
     .sidebar {
       width: 240px;
       background: var(--burgundy);
@@ -30,6 +33,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
+      z-index: 100;
     }
     .sidebar h1 {
       font-size: 1.6rem;
@@ -52,6 +56,18 @@
       background: var(--gold);
       color: var(--charcoal);
     }
+    .sidebar .logout-btn {
+      margin-top: auto;
+      background: transparent;
+      border: 1px solid var(--error);
+      color: var(--error);
+    }
+    .sidebar .logout-btn:hover {
+      background: var(--error);
+      color: white;
+    }
+
+    /* ===== Main ===== */
     .main {
       margin-left: 240px;
       padding: 2rem;
@@ -70,6 +86,9 @@
       border-collapse: collapse;
       margin-bottom: 2rem;
       background: #222;
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
     }
     th, td {
       padding: 0.7rem;
@@ -106,7 +125,7 @@
     .card { background: #222; padding: 1.5rem; border: 1px solid #333; }
     .gallery { display: flex; flex-wrap: wrap; gap: 1rem; }
     .lookbook-item { position: relative; width: 150px; }
-    .lookbook-item img { width: 150px; height: 150px; object-fit: cover; border: 2px solid var(--gold); }
+    .lookbook-item img { width: 150px; height: 150px; object-fit: cover; border: 2px solid var(--gold); cursor: pointer; }
     .lookbook-item .btn-danger { position: absolute; bottom: 5px; left: 5px; padding: 0.3rem 0.6rem; font-size: 0.7rem; }
     .message { padding: 1rem; margin: 1rem 0; background: #2a2a2a; border-left: 4px solid var(--gold); }
     .login-overlay {
@@ -118,12 +137,14 @@
       justify-content: center;
       align-items: center;
       z-index: 999;
+      padding: 1rem;
     }
     .login-box {
       background: var(--burgundy);
       padding: 2rem;
       border: 1px solid var(--gold);
       width: 350px;
+      max-width: 100%;
       text-align: center;
     }
     .login-box input {
@@ -151,13 +172,14 @@
       z-index: 200;
       justify-content: center;
       align-items: center;
+      padding: 1rem;
     }
     .modal.active { display: flex; }
     .modal-content {
       background: var(--charcoal);
       padding: 2rem;
       width: 400px;
-      max-width: 90%;
+      max-width: 100%;
       border: 1px solid var(--gold);
     }
     .modal-content input, .modal-content textarea {
@@ -167,6 +189,88 @@
       background: var(--gray, #2a2a2a);
       border: 1px solid #444;
       color: var(--cream);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 500;
+      justify-content: center;
+      align-items: center;
+      cursor: zoom-out;
+      padding: 1rem;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border: 2px solid var(--gold);
+    }
+
+    /* ===== Mobile toggle button ===== */
+    .mobile-toggle {
+      display: none;
+      background: var(--burgundy);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 0.8rem;
+      cursor: pointer;
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 1rem;
+        gap: 0.5rem;
+      }
+      .sidebar h1 {
+        width: 100%;
+        text-align: center;
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+      }
+      .sidebar button {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+      }
+      .sidebar .logout-btn {
+        margin-top: 0;
+      }
+      .main {
+        margin-left: 0;
+        padding: 1rem;
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .lookbook-item {
+        width: 120px;
+      }
+      .lookbook-item img {
+        width: 120px;
+        height: 120px;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+      }
     }
   </style>
 </head>
@@ -182,12 +286,13 @@
 
   <div class="sidebar" id="sidebar" style="display:none;">
     <h1>ROMAN KENO</h1>
-    <button data-module="stock" class="active">📦 Stock Management</button>
-    <button data-module="sets">🧩 Sets & Bundles</button>
-    <button data-module="listings">🛍️ Website Listings</button>
-    <button data-module="lookbook">📸 Artisan Lookbook</button>
-    <button data-module="orders">📋 Orders & Customers</button>
-    <button data-module="content">✏️ Content Editor</button>
+    <button data-module="stock" class="active">📦 Stock</button>
+    <button data-module="sets">🧩 Sets</button>
+    <button data-module="listings">🛍️ Listings</button>
+    <button data-module="lookbook">📸 Lookbook</button>
+    <button data-module="orders">📋 Orders</button>
+    <button data-module="content">✏️ Content</button>
+    <button class="logout-btn" onclick="logoutAdmin()">Logout</button>
   </div>
 
   <div class="main" id="main" style="display:none;">
@@ -322,8 +427,13 @@
     </div>
   </div>
 
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
   <script>
-    const API_BASE = 'https://script.google.com/macros/s/AKfycbyPKotHz7GShmocCJgqpc0dsGzsKRQ4pFfhcEjtcMKlU9KdxLw0zHx5jR7HtAkZ2Uc_iQ/exec';
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbxPQub5Ce5ohWuYhjrkqM7ByOm5V9LpBiqQiATBSJWSJomygpCCsv22ecCV-jNES5xh/exec';
     let adminKey = sessionStorage.getItem('adminKey') || '';
     let stockData = [];
     let setsData = [];
@@ -336,6 +446,15 @@
       if (!key) return showLoginError('Please enter a key');
       adminKey = key;
       checkAdminKey();
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('adminKey');
+      adminKey = '';
+      document.getElementById('login-overlay').style.display = 'flex';
+      document.getElementById('sidebar').style.display = 'none';
+      document.getElementById('main').style.display = 'none';
+      document.getElementById('admin-key-input').value = '';
     }
 
     function checkAdminKey() {
@@ -362,7 +481,16 @@
       setTimeout(() => div.remove(), 3000);
     }
 
-    // API helper: uses GET for most, POST with text/plain for uploads
+    // Lightbox
+    function openLightbox(imgSrc) {
+      document.getElementById('lightbox-img').src = imgSrc;
+      document.getElementById('lightbox').classList.add('active');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    // API helper
     async function apiCall(action, params = {}) {
       const url = new URL(API_BASE);
       const isUploadAction = ['uploadImage', 'uploadLookbookImage', 'uploadSetImage'].includes(action);
@@ -392,7 +520,7 @@
       }
     }
 
-    document.querySelectorAll('.sidebar button').forEach(btn => {
+    document.querySelectorAll('.sidebar button:not(.logout-btn)').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -429,7 +557,7 @@
           <td>${item['Total Single Items Available']}</td>
           <td>${item['Unit Cost Price']}</td>
           <td>${item['Resell Price']}</td>
-          <td>${item['Image URL'] ? `<img src="${item['Image URL']}" style="width:50px;height:50px;object-fit:cover;">` : '-'}</td>
+          <td>${item['Image URL'] ? `<img src="${item['Image URL']}" style="width:50px;height:50px;object-fit:cover;cursor:pointer;" onclick="openLightbox('${item['Image URL']}')">` : '-'}</td>
           <td><button onclick="openStockEdit('${item['SKU / Item Code']}')">Edit</button></td>
         </tr>
       `).join('');
@@ -540,7 +668,7 @@
           <td>${set['Title']}</td>
           <td>${set['Total Cost']}</td>
           <td>${set['Resell Price']}</td>
-          <td>${set['Image URL'] ? `<img src="${set['Image URL']}" style="width:50px;height:50px;object-fit:cover;">` : '-'}</td>
+          <td>${set['Image URL'] ? `<img src="${set['Image URL']}" style="width:50px;height:50px;object-fit:cover;cursor:pointer;" onclick="openLightbox('${set['Image URL']}')">` : '-'}</td>
           <td>
             <button onclick="editSet('${set['Set ID']}')">Edit</button>
             <button class="btn-danger" onclick="deleteSet('${set['Set ID']}')">Delete</button>
@@ -558,7 +686,6 @@
       document.getElementById('set-components').value = JSON.stringify(set.ComponentsParsed, null, 2);
       document.getElementById('set-total-cost').value = set['Total Cost'];
       document.getElementById('set-resell-price').value = set['Resell Price'];
-      // Clear file input; existing image URL is already in set form
     }
 
     async function deleteSet(id) {
@@ -760,7 +887,7 @@
         }
         gallery.innerHTML = images.map(img => `
           <div class="lookbook-item">
-            <img src="${img['Content URL/Text']}" alt="Artisan Piece">
+            <img src="${img['Content URL/Text']}" alt="Artisan Piece" onclick="openLightbox('${img['Content URL/Text']}')">
             <button class="btn-danger" onclick="deleteLookbookImage(this)" data-url="${img['Content URL/Text']}">Delete</button>
           </div>
         `).join('');
@@ -783,7 +910,6 @@
       }
     }
 
-    // === DELETE LOOKBOOK IMAGE ===
     async function deleteLookbookImage(btn) {
       const url = btn.getAttribute('data-url');
       if (!confirm('Delete this lookbook image?')) return;
@@ -794,7 +920,6 @@
       } catch (err) { showMessage('Delete failed: ' + err.message); }
     }
 
-    // === TEST UPLOAD ===
     async function testUpload() {
       try {
         const tinyImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+4p4sAAAAASUVORK5CYII=';
