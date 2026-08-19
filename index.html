@@ -320,7 +320,6 @@
 
   <script>
     // === CONFIGURATION ===
-    // New deployment URL (as provided)
     const API_BASE = 'https://script.google.com/macros/s/AKfycbxPQub5Ce5ohWuYhjrkqM7ByOm5V9LpBiqQiATBSJWSJomygpCCsv22ecCV-jNES5xh/exec';
 
     // === API helper ===
@@ -340,7 +339,6 @@
       return data;
     }
 
-    // === Auth modal handlers ===
     function openAuth(type) {
       document.getElementById(type + '-modal').classList.add('active');
     }
@@ -348,16 +346,13 @@
       document.getElementById(type + '-modal').classList.remove('active');
     }
 
-    // === Load supplies ===
     async function loadSupplies() {
       const container = document.getElementById('product-grid');
       try {
         const listings = await apiCall('getLiveListings');
-        if (!Array.isArray(listings)) {
-          throw new Error('Invalid data from server');
-        }
+        if (!Array.isArray(listings)) throw new Error('Invalid data');
         if (listings.length === 0) {
-          container.innerHTML = '<p>No supplies currently listed. Please check back soon.</p>';
+          container.innerHTML = '<p>No supplies currently listed.</p>';
           return;
         }
         container.innerHTML = listings.map(l => `
@@ -377,14 +372,11 @@
       }
     }
 
-    // === Load lookbook ===
     async function loadLookbook() {
       const container = document.getElementById('lookbook-gallery');
       try {
         const images = await apiCall('getLookbookImages');
-        if (!Array.isArray(images)) {
-          throw new Error('Invalid data from server');
-        }
+        if (!Array.isArray(images)) throw new Error('Invalid data');
         if (images.length === 0) {
           container.innerHTML = '<p>No artisan pieces currently displayed.</p>';
           return;
@@ -396,7 +388,6 @@
       }
     }
 
-    // === Load about text ===
     async function loadAbout() {
       const container = document.getElementById('about-text');
       try {
@@ -408,7 +399,6 @@
       }
     }
 
-    // === Cart (simple) ===
     function addToCart(id, title, price) {
       let cart = JSON.parse(sessionStorage.getItem('cart') || '[]');
       cart.push({ listingId: id, title, price, qty: 1 });
@@ -416,7 +406,6 @@
       alert(`Added "${title}" to cart.`);
     }
 
-    // === Registration ===
     async function register() {
       const data = {
         name: document.getElementById('reg-name').value,
@@ -438,7 +427,6 @@
       }
     }
 
-    // === Login ===
     async function login() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
@@ -456,13 +444,11 @@
       }
     }
 
-    // === Contact (placeholder) ===
     function sendContact() {
       alert('Thank you for your message. We will respond within 24 hours.');
       document.querySelector('.contact-form').reset();
     }
 
-    // === Initialise ===
     window.onload = function() {
       loadSupplies();
       loadLookbook();
