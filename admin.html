@@ -849,6 +849,7 @@
           <td>${l['Selling Price']}</td>
           <td>${l['Status']}</td>
           <td>
+            <button onclick="editSource('${l['Type']}','${l['Source ID']}')">Edit source</button>
             <button onclick="publishListing('${l['Listing ID']}')">Publish to site</button>
             <button onclick="pushListingToShopify('${l['Listing ID']}')">Publish to Shopify</button>
             <button class="btn-danger" onclick="deleteStaging('${l['Listing ID']}')">Delete</button>
@@ -1003,6 +1004,18 @@
         showMessage('Saved');
       } catch (err) { showMessage('Save failed: ' + err.message); }
     }
+    /* ---- jump from a listing to the set/stock row it came from ---- */
+    function editSource(type, sourceId) {
+      if (!sourceId) return showMessage('No source linked to this listing');
+      const isSet = String(type || '').toLowerCase() === 'set';
+      const btn = document.querySelector('.sidebar button[data-module="' + (isSet ? 'sets' : 'stock') + '"]');
+      if (btn) btn.click();
+      setTimeout(() => {
+        try { isSet ? editSet(sourceId) : openStockEdit(sourceId); }
+        catch (e) { showMessage('Could not open source: ' + e.message); }
+      }, 60);
+    }
+
     /* ================= SHOPIFY ================= */
     const BRIDGE_URL_KEY = 'rkBridgeUrl', BRIDGE_KEY_KEY = 'rkBridgeKey';
     const SHOP_ADMIN = 'https://admin.shopify.com/store/romankenojewelry/products/';
