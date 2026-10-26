@@ -575,6 +575,14 @@
       document.getElementById('lightbox').classList.remove('active');
     }
 
+    function plainText(html, max = 120) {
+      const d = document.createElement('div');
+      d.innerHTML = String(html || '');
+      const t = (d.textContent || '').replace(/\s+/g, ' ').trim();
+      if (t.length <= max) return t;
+      return t.slice(0, max).replace(/\s\S*$/, '') + '\u2026';
+    }
+
     function openProductModal(listing) {
       currentProduct = listing;
       document.getElementById('product-modal-image').src = (listing['Image URLs'] || '').split(',')[0] || 'https://via.placeholder.com/400';
@@ -614,7 +622,7 @@
             <img src="${(l['Image URLs'] || '').split(',')[0] || 'https://via.placeholder.com/400'}" alt="${l['Title']}">
             <div class="info">
               <h3>${l['Title']}</h3>
-              <p>${l['Description'] || ''}</p>
+              <p>${plainText(l['Description'], 110)}</p>
               <div class="price">£${l['Selling Price']}</div>
             </div>
           </div>
