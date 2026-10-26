@@ -131,7 +131,7 @@ function attachImage_(productId, url, alt) {
 /* --------------------------------------------------------------- actions -- */
 
 function doGet(e) {
-  return json_({ success: true, service: 'Roman Keno Shopify Bridge', actions: ['ping', 'pushListing', 'listProducts'] });
+  return json_({ success: true, service: 'Roman Keno Shopify Bridge', actions: ['ping', 'pushListing', 'listProducts', 'setStatus'] });
 }
 
 function doPost(e) {
@@ -144,6 +144,7 @@ function doPost(e) {
       case 'ping': return json_({ success: true, result: ping_() });
       case 'pushListing': return json_({ success: true, result: pushListing_(body.listing || {}, body.options || {}) });
       case 'listProducts': return json_({ success: true, result: listProducts_() });
+      case 'setStatus': return json_({ success: true, result: setStatus_(body.productId, body.status) });
       default: return json_({ success: false, error: 'unknown action: ' + body.action });
     }
   } catch (err) {
@@ -154,6 +155,13 @@ function doPost(e) {
 function ping_() {
   var d = api_('/shop.json');
   return { shop: d.shop.name, domain: d.shop.domain };
+}
+
+function setStatus_(productId, status) {
+  if (!productId) throw new Error('productId required');
+  if (['active', 'draft', 'archived'].indexOf(status) === -1) throw new Error('bad status');
+  var d = api_('/products/' + productId + '.json', 'PUT', { product: { id: productId, status: status } });
+  return { id: d.product.id, handle: d.product.handle, status: d.product.status };
 }
 
 function listProducts_() {
