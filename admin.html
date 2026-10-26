@@ -292,6 +292,7 @@
     <button data-module="lookbook">📸 Lookbook</button>
     <button data-module="orders">📋 Orders</button>
     <button data-module="content">✏️ Content</button>
+    <button data-module="shopify">🚀 Shopify</button>
     <button class="logout-btn" onclick="logoutAdmin()">Logout</button>
   </div>
 
@@ -404,6 +405,22 @@
     </div>
 
     <!-- CONTENT MODULE -->
+    <div id="module-shopify" class="module">
+      <h2>Shopify</h2>
+      <p style="opacity:.75;margin-bottom:1rem;">Publishing to Shopify goes through the bridge Web App. Paste its URL once — it is remembered in this browser only.</p>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem;">
+        <input id="bridge-url" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1;min-width:340px;">
+        <input id="bridge-key" placeholder="Bridge key" style="min-width:180px;">
+        <button onclick="saveBridge()">Save</button>
+        <button onclick="loadShopify()">Refresh</button>
+      </div>
+      <p id="bridge-status" style="margin-bottom:1rem;opacity:.8;"></p>
+      <table id="shopify-table">
+        <thead><tr><th>Title</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
     <div id="module-content" class="module">
       <h2>Content Editor</h2>
       <textarea id="about-text" rows="10" style="width:100%;"></textarea>
@@ -526,6 +543,7 @@
         btn.classList.add('active');
         document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
         document.getElementById('module-' + btn.dataset.module).classList.add('active');
+        if (btn.dataset.module === 'shopify' && typeof loadShopify === 'function') loadShopify();
       });
     });
 
@@ -831,7 +849,8 @@
           <td>${l['Selling Price']}</td>
           <td>${l['Status']}</td>
           <td>
-            <button onclick="publishListing('${l['Listing ID']}')">Publish</button>
+            <button onclick="publishListing('${l['Listing ID']}')">Publish to site</button>
+            <button onclick="pushListingToShopify('${l['Listing ID']}')">Publish to Shopify</button>
             <button class="btn-danger" onclick="deleteStaging('${l['Listing ID']}')">Delete</button>
           </td>
         </tr>
@@ -846,7 +865,7 @@
           <td>${l['Type']}</td>
           <td>${l['Title']}</td>
           <td>${l['Selling Price']}</td>
-          <td><button class="btn-danger" onclick="deleteLive('${l['Listing ID']}')">Remove</button></td>
+          <td><button class="btn-danger" onclick="deleteLive('${l['Listing ID']}')">Unpublish</button></td>
         </tr>
       `).join('');
     }
@@ -984,6 +1003,93 @@
         showMessage('Saved');
       } catch (err) { showMessage('Save failed: ' + err.message); }
     }
+    /* ================= SHOPIFY ================= */
+    const BRIDGE_URL_KEY = 'rkBridgeUrl', BRIDGE_KEY_KEY = 'rkBridgeKey';
+    const SHOP_ADMIN = 'https://admin.shopify.com/store/romankenojewelry/products/';
+
+    function bridgeCfg() {
+      return { url: localStorage.getItem(BRIDGE_URL_KEY) || '', key: localStorage.getItem(BRIDGE_KEY_KEY) || '' };
+    }
+
+    async function bridgeCall(action, payload = {}) {
+      const cfg = bridgeCfg();
+      if (!cfg.url) throw new Error('Paste the bridge URL and press Save first');
+      const res = await fetch(cfg.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ key: cfg.key, action }, payload)),
+        redirect: 'follow'
+      });
+      const j = await res.json();
+      if (!j.success) throw new Error(j.error || 'bridge error');
+      return j.result;
+    }
+
+    function saveBridge() {
+      localStorage.setItem(BRIDGE_URL_KEY, document.getElementById('bridge-url').value.trim());
+      localStorage.setItem(BRIDGE_KEY_KEY, document.getElementById('bridge-key').value.trim());
+      loadShopify();
+    }
+
+    function initBridgeFields() {
+      const cfg = bridgeCfg();
+      const u = document.getElementById('bridge-url');
+      const k = document.getElementById('bridge-key');
+      if (u) u.value = cfg.url;
+      if (k) k.value = cfg.key;
+    }
+
+    async function loadShopify() {
+      const status = document.getElementById('bridge-status');
+      const tbody = document.querySelector('#shopify-table tbody');
+      if (!tbody) return;
+      try {
+        const products = await bridgeCall('listProducts');
+        status.textContent = products.length + ' products on Shopify';
+        tbody.innerHTML = products.map(p => `
+          <tr>
+            <td>${p.title}</td>
+            <td>£${Number(p.price || 0).toFixed(2)}</td>
+            <td>${p.stock}</td>
+            <td>${p.status}</td>
+            <td>
+              ${p.status === 'active'
+                ? `<button onclick="setShopifyStatus('${p.id}','draft')">Unpublish</button>`
+                : `<button onclick="setShopifyStatus('${p.id}','active')">Publish</button>`}
+              <a href="${SHOP_ADMIN}${p.id}" target="_blank"><button>Edit</button></a>
+            </td>
+          </tr>`).join('');
+      } catch (err) {
+        status.textContent = 'Not connected: ' + err.message;
+        tbody.innerHTML = '';
+      }
+    }
+
+    async function setShopifyStatus(productId, status) {
+      try {
+        await bridgeCall('setStatus', { productId, status });
+        showMessage('Shopify: ' + status);
+        loadShopify();
+      } catch (err) { showMessage('Shopify failed: ' + err.message); }
+    }
+
+    async function pushListingToShopify(listingId) {
+      try {
+        showMessage('Sending to Shopify…');
+        const live = await apiCall('getLiveListingsAdmin');
+        const staging = await apiCall('getStagingListings');
+        const listing = (live || []).find(l => String(l['Listing ID']) === String(listingId))
+                     || (staging || []).find(l => String(l['Listing ID']) === String(listingId));
+        if (!listing) throw new Error('listing not found');
+        const r = await bridgeCall('pushListing', { listing });
+        const extra = r.imageErrors && r.imageErrors.length ? ' | image issues: ' + r.imageErrors.length : '';
+        showMessage('Shopify ' + r.action + ': ' + r.handle + ' (£' + r.price + ')' + extra);
+        loadShopify();
+      } catch (err) { showMessage('Shopify failed: ' + err.message); }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { initBridgeFields(); });
+
   </script>
 </body>
 </html>
