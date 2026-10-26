@@ -400,6 +400,32 @@
       position: absolute; left: 0; top: 0.55rem;
       font-size: 0.5rem; color: #c5a059;
     }
+
+    /* product cards */
+    .product-card { overflow: hidden; }
+    .product-card img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+    .product-card .info { padding: 1.15rem 1.2rem 1.35rem; }
+    .product-card .info h3 {
+      font-size: 1.14rem;
+      line-height: 1.32;
+      letter-spacing: 0.01em;
+      margin: 0 0 0.6rem;
+    }
+    .product-card .info p {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: rgba(232, 227, 216, 0.76);
+      margin: 0 0 0.9rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .product-card .price {
+      font-size: 1.05rem;
+      letter-spacing: 0.02em;
+      padding-top: 0.15rem;
+    }
   </style>
 </head>
 <body>
